@@ -5,16 +5,17 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Python Debugger: FastAPI",
-            "type": "debugpy",
-            "request": "launch",
-            "module": "uvicorn",
-            "args": [
-                "app.main:app",
-                "--reload"
+            "name": "Python Debugger: FastAPI (uv)",
+                "--reload",
+                "--host", "0.0.0.0",
+                "--port", "8000"
             ],
             "cwd": "${workspaceFolder}/backend",
-            "jinja": true
+            "python": "${workspaceFolder}/backend/.venv/bin/python",
+            "jinja": true,
+            "env": {
+                "PYTHONPATH": "${workspaceFolder}/backend"
+            }
         }
     ]
 }

@@ -8,5 +8,5 @@ dependencies = [
     "alembic>=1.16.2",
     "asyncpg>=0.30.0",
     "fastapi[standard]>=0.115.13",
-    "pydantic-settings>=2.10.1",
+    "psycopg2>=2.9.10",
 ]
