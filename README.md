@@ -86,3 +86,48 @@
 * **進階權限控制**: 為共享日曆的成員提供更細緻的權限設定（例如：「僅供檢視」、「可新增事件但不可修改他人事件」等）。
 * **檔案附件**: 允許使用者將檔案或圖片附加到事件中。
 * **提醒與通知**: 透過系統通知或電子郵件，在事件即將到來時提醒使用者。
+
+## 7. 開發環境設定 (Development Setup)
+
+本專案使用 [uv](https://github.com/astral-sh/uv) 作為虛擬環境與套件管理工具。
+
+1. **安裝依賴套件**:
+   在 `backend` 目錄下執行指令，uv 會自動建立虛擬環境並安裝依賴。
+   ```bash
+   uv sync
+   ```
+
+2. **執行指令**:
+   使用 `uv run` 來執行指令，它會自動在虛擬環境中執行。
+   ```bash
+   # 範例：執行 FastAPI 開發伺服器
+   uv run fastapi dev main.py
+   
+   # 範例：執行任何 Python 指令
+   uv run python -c "print('Hello World')"
+   ```
+
+## 8. 資料庫遷移 (Database Migrations)
+
+本專案使用 [Alembic](https://alembic.sqlalchemy.org/) 來管理資料庫結構的變更。
+
+* **產生新的遷移腳本**:
+  當您修改了 `backend/app/models/` 中的模型定義後，執行此指令來自動產生遷移腳本。請務必用一段有意義的訊息來描述您的變更。
+  ```bash
+  # 在 backend 目錄下執行
+  uv run alembic revision --autogenerate -m "Your descriptive message here"
+  ```
+
+* **套用遷移至資料庫**:
+  執行此指令會將所有未執行的遷移腳本套用到資料庫，更新資料庫結構至最新版本。
+  ```bash
+  # 在 backend 目錄下執行
+  uv run alembic upgrade head
+  ```
+
+* **降級資料庫版本 (較少使用)**:
+  將資料庫回退一個版本。
+  ```bash
+  # 在 backend 目錄下執行
+  uv run alembic downgrade -1
+  ```
