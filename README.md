@@ -101,7 +101,7 @@
    使用 `uv run` 來執行指令，它會自動在虛擬環境中執行。
    ```bash
    # 範例：執行 FastAPI 開發伺服器
-   uv run fastapi dev main.py
+   uv run uvicorn app.main:app --reload
    
    # 範例：執行任何 Python 指令
    uv run python -c "print('Hello World')"
