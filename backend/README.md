@@ -93,11 +93,26 @@ uv run alembic upgrade head
 ### 執行測試
 
 ```bash
-# 執行所有測試（未來實作）
+# 執行所有測試
 uv run pytest
 
-# 執行測試並顯示覆蓋率（未來實作）
+# 執行測試並顯示覆蓋率
 uv run pytest --cov=app
+
+# 執行特定測試檔案
+uv run pytest tests/test_crud_list.py
+
+# 執行特定測試類別
+uv run pytest tests/test_api_list.py::TestListAPI
+
+# 執行特定測試函數
+uv run pytest tests/test_crud_list.py::TestListCRUD::test_create_list
+
+# 顯示詳細輸出
+uv run pytest -v
+
+# 執行測試並停在第一個失敗
+uv run pytest -x
 ```
 
 ## API 文檔
