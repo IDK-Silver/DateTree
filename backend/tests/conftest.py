@@ -6,6 +6,8 @@ from fastapi.testclient import TestClient
 from app.main import app
 from app.models.base import Base
 from app.api.deps import get_db
+from app import crud, models
+from app.core.security import create_access_token
 
 # Create test database URL (using SQLite for testing)
 SQLALCHEMY_DATABASE_URL = "sqlite:///./blob/pytest/test.db"
@@ -51,3 +53,30 @@ def cleanup_db():
     # Clean up: drop all tables and recreate them
     Base.metadata.drop_all(bind=engine)
     Base.metadata.create_all(bind=engine)
+
+@pytest.fixture
+def test_user(db_session):
+    """Create a test user."""
+    from app.schemas.user import UserCreate
+    user_data = UserCreate(
+        email="test@example.com",
+        password="testpassword123"
+    )
+    user = crud.user.create(db_session, obj_in=user_data)
+    return user
+
+@pytest.fixture
+def test_token(test_user):
+    """Create a test token for authentication."""
+    return create_access_token(subject=test_user.email)
+
+@pytest.fixture
+def auth_headers(test_token):
+    """Create authentication headers."""
+    return {"Authorization": f"Bearer {test_token}"}
+
+@pytest.fixture
+def authenticated_client(client, auth_headers):
+    """Create an authenticated test client."""
+    client.headers.update(auth_headers)
+    return client

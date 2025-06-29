@@ -2,6 +2,7 @@ from typing import Any, List as ListTyping
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
+from app import models
 from app.crud.crud_list import list_crud
 from app.schemas import list as list_schemas
 from app.api import deps
@@ -13,7 +14,7 @@ def read_lists(
     db: Session = Depends(deps.get_db),
     skip: int = 0,
     limit: int = 100,
-    current_user: dict = Depends(deps.get_current_active_user),
+    current_user: models.User = Depends(deps.get_current_active_user),
 ):
     """
     Retrieve all lists.
@@ -29,7 +30,7 @@ def read_lists_by_calendar(
     db: Session = Depends(deps.get_db),
     skip: int = 0,
     limit: int = 100,
-    current_user: dict = Depends(deps.get_current_active_user),
+    current_user: models.User = Depends(deps.get_current_active_user),
 ):
     """
     Retrieve lists for a specific calendar.
@@ -44,7 +45,7 @@ def read_lists_by_calendar(
 def read_list(
     list_id: int,
     db: Session = Depends(deps.get_db),
-    current_user: dict = Depends(deps.get_current_active_user),
+    current_user: models.User = Depends(deps.get_current_active_user),
 ):
     """
     Get a specific list by ID.
@@ -60,13 +61,17 @@ def create_list(
     *,
     db: Session = Depends(deps.get_db),
     list_in: list_schemas.ListCreate,
-    current_user: dict = Depends(deps.get_current_active_user),
+    current_user: models.User = Depends(deps.get_current_active_user),
 ):
     """
     Create a new list.
-    The list must be associated with a calendar that the user owns or has access to.
-    Add permission check here in the future.
+    This endpoint is now protected and requires a valid token.
+    The `current_user` object is now available for use.
     """
+    # 接下來，您可以在這裡使用 current_user.id 來進行權限檢查或記錄操作者
+    # 例如：檢查 current_user 是否有權限在 list_in.calendar_id 中建立清單
+    print(f"User {current_user.email} is creating a list.")
+    
     list_obj = list_crud.create(db=db, obj_in=list_in)
     return list_obj
 
@@ -76,7 +81,7 @@ def update_list(
     db: Session = Depends(deps.get_db),
     list_id: int,
     list_in: list_schemas.ListUpdate,
-    current_user: dict = Depends(deps.get_current_active_user),
+    current_user: models.User = Depends(deps.get_current_active_user),
 ):
     """
     Update a list.
@@ -93,7 +98,7 @@ def delete_list(
     *,
     db: Session = Depends(deps.get_db),
     list_id: int,
-    current_user: dict = Depends(deps.get_current_active_user),
+    current_user: models.User = Depends(deps.get_current_active_user),
 ):
     """
     Delete a list.
