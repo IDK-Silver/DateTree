@@ -1,15 +1,24 @@
-# Import model classes from individual files for external modules to access from app.models
-from .user import User
-from .calendar import Calendar, calendar_member_association
-from .event import Event
-from .enums import PermissionLevel, EventStatus
+# Import the Base so it's accessible from this package.
+from .base import Base
 
-# Optional: define __all__ to explicitly specify what gets imported with `from app.models import *`
+# Import all the models so they are registered with SQLAlchemy's metadata.
+# This is crucial for Alembic to detect the tables.
+from .user import User
+from .calendar import Calendar, calendar_user_association
+from .list import List, ListType
+from .list_item import ListItem
+from .vote import Vote
+from .event import Event
+
+# You can also define a __all__ to control what `from .models import *` imports.
 __all__ = [
+    "Base",
     "User",
     "Calendar",
+    "calendar_user_association",
+    "List",
+    "ListType",
+    "ListItem",
+    "Vote",
     "Event",
-    "calendar_member_association",
-    "PermissionLevel",
-    "EventStatus",
 ]

@@ -1,27 +1,23 @@
-from sqlalchemy import Column, DateTime, Integer, String
+from sqlalchemy import Column, Integer, String, DateTime
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
-
-from ..db.basic import Base
-
+from .base import Base
 
 class User(Base):
-    """User model"""
+    """
+    Represents a user in the system.
+    """
     __tablename__ = "users"
 
     id = Column(Integer, primary_key=True, index=True)
+    username = Column(String, unique=True, index=True, nullable=False)
     email = Column(String, unique=True, index=True, nullable=False)
     hashed_password = Column(String, nullable=False)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
 
-    # Relationship: a user can own multiple calendars
-    owned_calendars = relationship("Calendar", back_populates="owner")
-
-    # Relationship: a user can be a member of multiple calendars (many-to-many)
-    # Through the intermediate table `calendar_members` defined in calendar.py
+    # Relationships are defined using strings to avoid circular imports.
+    # The actual relationship object is resolved by SQLAlchemy at runtime.
     calendars = relationship(
-        "Calendar", secondary="calendar_members", back_populates="members"
+        "Calendar", secondary="calendar_user_association", back_populates="members"
     )
-
-    def __repr__(self):
-        return f"<User(id={self.id}, email='{self.email}')>"
+    votes = relationship("Vote", back_populates="user")
