@@ -1,29 +1,19 @@
-from sqlalchemy import (Column, DateTime, Enum, ForeignKey, Integer, String,
-                        Text)
+from sqlalchemy import Column, Integer, String, Text, DateTime, ForeignKey
 from sqlalchemy.orm import relationship
-from sqlalchemy.sql import func
-
-from ..db.basic import Base
-from .enums import EventStatus
+from .base import Base
 
 class Event(Base):
-    """Event/Todo item model"""
+    """
+    Represents a scheduled event on the calendar with a specific date and time.
+    """
     __tablename__ = "events"
 
     id = Column(Integer, primary_key=True, index=True)
     title = Column(String, nullable=False)
-    content = Column(Text, nullable=True)  # For storing Markdown content
-    status = Column(Enum(EventStatus), nullable=False, default=EventStatus.TODO)
-    start_time = Column(DateTime(timezone=True), nullable=True)
+    description = Column(Text, nullable=True)
+    start_time = Column(DateTime(timezone=True), nullable=False)
     end_time = Column(DateTime(timezone=True), nullable=True)
-    created_at = Column(DateTime(timezone=True), server_default=func.now())
-    updated_at = Column(
-        DateTime(timezone=True), server_default=func.now(), onupdate=func.now()
-    )
-
-    # Relationship: each event must belong to a calendar (many-to-one)
     calendar_id = Column(Integer, ForeignKey("calendars.id"), nullable=False)
-    calendar = relationship("Calendar", back_populates="events")
+    creator_id = Column(Integer, ForeignKey("users.id"))
 
-    def __repr__(self):
-        return f"<Event(id={self.id}, title='{self.title}')>"
+    calendar = relationship("Calendar", back_populates="events")

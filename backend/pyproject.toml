@@ -9,4 +9,5 @@ dependencies = [
     "asyncpg>=0.30.0",
     "fastapi[standard]>=0.115.13",
     "psycopg2>=2.9.10",
+    "pydantic-settings>=2.10.1",
 ]
