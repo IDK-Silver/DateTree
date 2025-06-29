@@ -7,20 +7,27 @@
 ### 📁 測試檔案結構
 
 ```text
-backend/tests/
-├── __init__.py
-├── conftest.py              # 測試配置和共用 fixtures
-├── test_crud_list.py        # CRUD 操作測試
-├── test_api_list.py         # API 端點測試
-└── test_schemas_list.py     # Pydantic schema 測試
+backend/
+├── tests/                   # 測試程式碼
+│   ├── __init__.py
+│   ├── conftest.py         # 測試配置和共用 fixtures
+│   ├── test_crud_list.py   # CRUD 操作測試
+│   ├── test_api_list.py    # API 端點測試
+│   └── test_schemas_list.py # Pydantic schema 測試
+├── blob/                   # 測試產生的檔案
+│   └── pytest/
+│       ├── test.db         # 測試資料庫 (SQLite)
+│       └── .pytest_cache/  # pytest 快取
+└── pytest.ini             # pytest 配置檔案
 ```
 
 ### 🔧 測試配置
 
 - **測試框架**: pytest
-- **測試資料庫**: SQLite (隔離的測試環境)
+- **測試資料庫**: SQLite (位於 `blob/pytest/test.db`)
 - **API 測試**: FastAPI TestClient
 - **覆蓋範圍**: CRUD 操作、API 端點、資料驗證
+- **快取目錄**: `blob/pytest/.pytest_cache/`
 
 ### 📊 測試統計
 

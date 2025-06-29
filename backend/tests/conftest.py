@@ -8,7 +8,7 @@ from app.models.base import Base
 from app.api.deps import get_db
 
 # Create test database URL (using SQLite for testing)
-SQLALCHEMY_DATABASE_URL = "sqlite:///./test.db"
+SQLALCHEMY_DATABASE_URL = "sqlite:///./blob/pytest/test.db"
 
 engine = create_engine(
     SQLALCHEMY_DATABASE_URL, 
