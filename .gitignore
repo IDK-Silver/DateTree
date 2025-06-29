@@ -215,3 +215,23 @@ ENV/
 
 # Environment variables file
 .env
+
+# Test databases
+test.db
+test_*.db
+*.test.db
+blob/pytest/
+
+# pytest cache
+.pytest_cache/
+
+# Coverage reports
+htmlcov/
+.coverage
+.coverage.*
+coverage.xml
+
+# mypy
+.mypy_cache/
+.dmypy.json
+dmypy.json
