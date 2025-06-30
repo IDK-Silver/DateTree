@@ -68,8 +68,9 @@ def create_list(
     This endpoint is now protected and requires a valid token.
     The `current_user` object is now available for use.
     """
-    # 接下來，您可以在這裡使用 current_user.id 來進行權限檢查或記錄操作者
-    # 例如：檢查 current_user 是否有權限在 list_in.calendar_id 中建立清單
+    # You can now use current_user.id for permission checks or to record the operator.
+    # For example, check if the current_user has permission to create a list
+    # in the specified list_in.calendar_id.
     print(f"User {current_user.email} is creating a list.")
     
     list_obj = list_crud.create(db=db, obj_in=list_in)
