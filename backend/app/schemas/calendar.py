@@ -3,6 +3,7 @@ from pydantic import BaseModel
 from typing import Optional, List
 from datetime import datetime
 from .user import User
+from app.models.calendar import CalendarType
 
 # --- Base Properties ---
 class CalendarBase(BaseModel):
@@ -22,6 +23,7 @@ class CalendarUpdate(BaseModel):
 class Calendar(CalendarBase):
     id: int
     owner_id: int
+    calendar_type: CalendarType
     created_at: datetime
     owner: User
     members: List[User] = []

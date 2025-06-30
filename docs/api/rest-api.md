@@ -19,7 +19,7 @@ DateTree REST API 提供完整的清單和事件管理功能。
 POST /api/v1/users/register
 ```
 
-**描述**: 註冊新用戶
+**描述**: 註冊新用戶。此操作會自動為新用戶建立一個預設的個人日曆。
 
 **請求主體**：
 
@@ -40,33 +40,40 @@ POST /api/v1/users/register
 }
 ```
 
-**錯誤回應**：
+### Calendars (日曆管理)
 
-* **400 Bad Request** - 電子郵件已存在
+#### 取得所有日曆
+
+```http
+GET /api/v1/calendars/
+```
+
+**描述**: 取得認證用戶擁有的所有日曆。
+
+#### 建立新日曆
+
+```http
+POST /api/v1/calendars/
+```
+
+**描述**: 建立一個新的 `GENERAL` 類型日曆。
+
+**請求主體**：
+
 ```json
 {
-  "detail": "The user with this email already exists in the system."
+  "name": "新的日曆",
+  "description": "這是一個測試日曆"
 }
 ```
 
-* **422 Unprocessable Entity** - 驗證錯誤
-```json
-{
-  "detail": [
-    {
-      "loc": ["body", "email"],
-      "msg": "field required",
-      "type": "missing"
-    }
-  ]
-}
+#### 刪除日曆
+
+```http
+DELETE /api/v1/calendars/{calendar_id}
 ```
 
-**注意事項**：
-- 電子郵件必須是有效的電子郵件格式
-- 密碼欄位為必填（目前無強度驗證）
-- 成功註冊後用戶預設為啟用狀態
-- 回應中不會包含密碼或雜湊密碼
+**描述**: 刪除一個日曆。注意：`PERSONAL` 類型的日曆無法被刪除。
 
 ### Lists (清單管理)
 

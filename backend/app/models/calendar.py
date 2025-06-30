@@ -1,3 +1,4 @@
+import enum
 from sqlalchemy import (
     Column,
     Integer,
@@ -6,10 +7,16 @@ from sqlalchemy import (
     ForeignKey,
     DateTime,
     Table,
+    Enum,
 )
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 from .base import Base
+
+# Defines the type of a calendar
+class CalendarType(enum.Enum):
+    PERSONAL = "PERSONAL"  # Auto-created, non-deletable personal calendar
+    GENERAL = "GENERAL"    # User-created, general-purpose calendar
 
 # This table manages the many-to-many relationship between Users and Calendars.
 calendar_user_association = Table(
@@ -28,6 +35,7 @@ class Calendar(Base):
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String, nullable=False)
     description = Column(Text, nullable=True)
+    calendar_type = Column(Enum(CalendarType), nullable=False, default=CalendarType.GENERAL)
     owner_id = Column(Integer, ForeignKey("users.id"), nullable=False)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
 

@@ -8,6 +8,8 @@ from app.crud.crud_calendar import calendar_crud
 from app.schemas import calendar as calendar_schemas
 from app.api import deps
 
+from app.models.calendar import CalendarType
+
 router = APIRouter()
 
 @router.get("/", response_model=ListTyping[calendar_schemas.Calendar])
@@ -91,5 +93,10 @@ def delete_calendar(
         raise HTTPException(status_code=404, detail="Calendar not found")
     if calendar.owner_id != current_user.id:
         raise HTTPException(status_code=403, detail="Not enough permissions")
+    if calendar.calendar_type == CalendarType.PERSONAL:
+        raise HTTPException(
+            status_code=403,
+            detail="Personal calendars cannot be deleted."
+        )
     calendar = calendar_crud.remove(db=db, id=calendar_id)
     return calendar
