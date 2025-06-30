@@ -11,6 +11,63 @@ DateTree REST API 提供完整的清單和事件管理功能。
 
 ## 📋 API 端點
 
+### Users (用戶管理)
+
+#### 用戶註冊
+
+```http
+POST /api/v1/users/register
+```
+
+**描述**: 註冊新用戶
+
+**請求主體**：
+
+```json
+{
+  "email": "user@example.com",
+  "password": "securepassword123"
+}
+```
+
+**成功回應** (200 OK)：
+
+```json
+{
+  "id": 1,
+  "email": "user@example.com",
+  "is_active": true
+}
+```
+
+**錯誤回應**：
+
+* **400 Bad Request** - 電子郵件已存在
+```json
+{
+  "detail": "The user with this email already exists in the system."
+}
+```
+
+* **422 Unprocessable Entity** - 驗證錯誤
+```json
+{
+  "detail": [
+    {
+      "loc": ["body", "email"],
+      "msg": "field required",
+      "type": "missing"
+    }
+  ]
+}
+```
+
+**注意事項**：
+- 電子郵件必須是有效的電子郵件格式
+- 密碼欄位為必填（目前無強度驗證）
+- 成功註冊後用戶預設為啟用狀態
+- 回應中不會包含密碼或雜湊密碼
+
 ### Lists (清單管理)
 
 #### 取得所有清單

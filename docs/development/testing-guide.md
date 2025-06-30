@@ -1,8 +1,8 @@
-# List CRUD API 測試實施摘要
+# DateTree API 測試實施摘要
 
 ## 🧪 測試架構概覽
 
-已成功為 DateTree 專案的 List CRUD API 實施了完整的 pytest 測試架構。
+已成功為 DateTree 專案實施了完整的 pytest 測試架構，涵蓋清單管理和用戶管理功能。
 
 ### 📁 測試檔案結構
 
@@ -11,9 +11,10 @@ backend/
 ├── tests/                   # 測試程式碼
 │   ├── __init__.py
 │   ├── conftest.py         # 測試配置和共用 fixtures
-│   ├── test_crud_list.py   # CRUD 操作測試
-│   ├── test_api_list.py    # API 端點測試
-│   └── test_schemas_list.py # Pydantic schema 測試
+│   ├── test_crud_list.py   # 清單 CRUD 操作測試
+│   ├── test_api_list.py    # 清單 API 端點測試
+│   ├── test_schemas_list.py # 清單 Pydantic schema 測試
+│   └── test_api_user.py    # 用戶 API 端點測試 ✨ 新增
 ├── blob/                   # 測試產生的檔案
 │   └── pytest/
 │       ├── test.db         # 測試資料庫 (SQLite)
@@ -26,17 +27,18 @@ backend/
 - **測試框架**: pytest
 - **測試資料庫**: SQLite (位於 `blob/pytest/test.db`)
 - **API 測試**: FastAPI TestClient
-- **覆蓋範圍**: CRUD 操作、API 端點、資料驗證
+- **覆蓋範圍**: CRUD 操作、API 端點、資料驗證、用戶註冊
 - **快取目錄**: `blob/pytest/.pytest_cache/`
 
 ### 📊 測試統計
 
-- **總測試數**: 29 個測試
+- **總測試數**: 41 個測試 ✨ **更新**
 - **通過率**: 100% ✅
 - **測試類別**:
-  - CRUD 測試: 9 個
-  - API 測試: 11 個  
-  - Schema 測試: 9 個
+  - 清單 CRUD 測試: 9 個
+  - 清單 API 測試: 15 個
+  - 清單 Schema 測試: 10 個
+  - 用戶 API 測試: 7 個 ✨ **新增**
 
 ### 🧩 測試分類
 
@@ -77,6 +79,16 @@ backend/
 - ✅ `test_schema_validation_errors` - 驗證錯誤測試
 - ✅ `test_schema_serialization` - 序列化測試
 
+#### 4. 用戶 API 測試 (`test_api_user.py`) ✨ **新增**
+
+- ✅ `test_register_user_success` - 成功註冊用戶
+- ✅ `test_register_user_duplicate_email` - 重複電子郵件錯誤
+- ✅ `test_register_user_invalid_email` - 無效電子郵件格式
+- ✅ `test_register_user_missing_password` - 缺少密碼
+- ✅ `test_register_user_missing_email` - 缺少電子郵件
+- ✅ `test_register_user_empty_password` - 空密碼處理
+- ✅ `test_register_user_weak_password_accepted` - 弱密碼接受測試
+
 ### 🚀 如何執行測試
 
 ```bash
@@ -85,9 +97,13 @@ uv run pytest
 
 # 執行特定測試檔案
 uv run pytest tests/test_crud_list.py
+uv run pytest tests/test_api_user.py
 
 # 顯示詳細輸出
 uv run pytest -v
+
+# 執行特定測試類別
+uv run pytest tests/test_api_user.py::TestUserRegistration -v
 
 # 執行測試並生成覆蓋率報告
 uv run pytest --cov=app
