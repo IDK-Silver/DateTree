@@ -71,3 +71,100 @@ def get_current_active_user(
     if not current_user.is_active:
         raise HTTPException(status_code=400, detail="Inactive user")
     return current_user
+
+
+def check_calendar_access(
+    db: Session, calendar_id: int, user: models.User
+) -> models.Calendar:
+    """
+    Check if user has access to the calendar.
+    Returns the calendar if user has access, raises HTTPException otherwise.
+    Uses optimized JOIN query instead of N+1 queries.
+    """
+    from sqlalchemy import or_
+    from app.models.calendar import calendar_user_association
+    
+    # Single query to check calendar existence and user access
+    calendar = (
+        db.query(models.Calendar)
+        .outerjoin(
+            calendar_user_association, 
+            models.Calendar.id == calendar_user_association.c.calendar_id
+        )
+        .filter(
+            models.Calendar.id == calendar_id,
+            or_(
+                models.Calendar.owner_id == user.id,  # User is owner
+                calendar_user_association.c.user_id == user.id  # User is member
+            )
+        )
+        .first()
+    )
+    
+    if not calendar:
+        # Check if calendar exists at all to provide better error message
+        calendar_exists = db.query(models.Calendar).filter(
+            models.Calendar.id == calendar_id
+        ).first()
+        
+        if not calendar_exists:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Calendar not found"
+            )
+        else:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Not enough permissions to access this calendar"
+            )
+    
+    return calendar
+
+
+def check_list_access(
+    db: Session, list_id: int, user: models.User
+) -> models.List:
+    """
+    Check if user has access to the list through calendar access.
+    Returns the list if user has access, raises HTTPException otherwise.
+    Uses optimized JOIN query to check both list and calendar access in one query.
+    """
+    from sqlalchemy import or_
+    from app.models.calendar import calendar_user_association
+    
+    # Single query to check list existence and user access through calendar
+    list_obj = (
+        db.query(models.List)
+        .join(models.Calendar, models.List.calendar_id == models.Calendar.id)
+        .outerjoin(
+            calendar_user_association,
+            models.Calendar.id == calendar_user_association.c.calendar_id
+        )
+        .filter(
+            models.List.id == list_id,
+            or_(
+                models.Calendar.owner_id == user.id,  # User owns calendar
+                calendar_user_association.c.user_id == user.id  # User is member
+            )
+        )
+        .first()
+    )
+    
+    if not list_obj:
+        # Check if list exists at all to provide better error message
+        list_exists = db.query(models.List).filter(
+            models.List.id == list_id
+        ).first()
+        
+        if not list_exists:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="List not found"
+            )
+        else:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Not enough permissions to access this list"
+            )
+    
+    return list_obj

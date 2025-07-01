@@ -107,8 +107,14 @@
 
 * **資料模型重構**: 完整實施擴展式多清單模型
 * **資料庫設計**: PostgreSQL 資料庫設計和遷移
-* **List CRUD API**: 完整的清單管理 REST API
-* **測試架構**: pytest 測試架構，29 個測試全部通過
+* **Complete API System**: 完整的 REST API 系統 ✅ **更新**
+  * **List CRUD API**: 清單管理 API
+  * **ListItem CRUD API**: 清單項目管理 API ✅ **新增**
+  * **Vote API**: 協作投票 API ✅ **新增**
+  * **Event API**: 事件管理 API ✅ **新增**
+  * **User Registration API**: 用戶註冊 API
+  * **Calendar Management API**: 日曆管理 API
+* **測試架構**: pytest 測試架構，41 個測試全部通過
 
 #### 開發工具
 
@@ -118,10 +124,7 @@
 
 ### 開發中的功能 🚧
 
-* **認證系統**: 使用者註冊、登入、權限控制
-* **ListItem CRUD API**: 清單項目管理 API
-* **Vote API**: 投票功能 API
-* **Event API**: 事件管理 API
+* **登入認證**: JWT token 驗證系統（用戶註冊已完成）
 
 ### 計劃中的功能 📋
 

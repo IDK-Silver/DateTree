@@ -12,8 +12,8 @@ class ListItem(Base):
     id = Column(Integer, primary_key=True, index=True)
     content = Column(Text, nullable=False)
     is_completed = Column(Boolean, default=False)
-    list_id = Column(Integer, ForeignKey("lists.id"), nullable=False)
-    creator_id = Column(Integer, ForeignKey("users.id"))
+    list_id = Column(Integer, ForeignKey("lists.id"), nullable=False, index=True)
+    creator_id = Column(Integer, ForeignKey("users.id"), index=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
 
     list_obj = relationship("List", back_populates="items")

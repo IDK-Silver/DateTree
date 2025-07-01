@@ -31,6 +31,7 @@ erDiagram
         bigint id PK
         varchar name
         text description
+        enum calendar_type
         bigint owner_id FK
         datetime created_at
         datetime updated_at

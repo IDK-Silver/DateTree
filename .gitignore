@@ -235,3 +235,17 @@ coverage.xml
 .mypy_cache/
 .dmypy.json
 dmypy.json
+
+# AI assistant files
+GEMINI.md
+IMPLEMENTATION_LOG.md
+
+# Editor temporary files
+*~
+.#*
+*.swp
+*.swo
+
+# Backup directories
+backup/
+**/backup/

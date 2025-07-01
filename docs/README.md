@@ -14,6 +14,8 @@
 - [ADR-001: 共享日曆協作模型](adr/001-shared-calendar-collaboration-model.md)
 - [ADR-002: 採用擴展式多清單模型](adr/002-adopt-extendable-multi-list-model.md)
 - [ADR-003: 資料庫遷移重置策略](adr/003-database-migration-reset-strategy.md)
+- [ADR-004: 預設個人日曆設計](adr/004-default-personal-calendar.md)
+- [ADR-005: 資料庫效能優化策略](adr/005-database-performance-optimization-strategy.md) ⭐ **New**
 
 ### 🔧 開發指南 (`guides/`)
 
@@ -24,6 +26,9 @@
 ### 🧪 開發實務 (`development/`)
 
 - [測試指南](development/testing-guide.md) - pytest 測試架構和最佳實踐
+- [程式碼審查診斷](development/code-review-diagnosis.md) - 完整的程式碼品質分析報告
+- [效能優化報告](development/performance-optimization-report.md) - 資料庫效能優化詳細分析
+- [外鍵優化說明](development/foreign-key-optimization.md) - 外鍵索引問題與解決方案
 
 ### 🚀 功能實施 (`implementation/`)
 
