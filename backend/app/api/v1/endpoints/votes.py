@@ -48,24 +48,24 @@ def create_vote(
     current_user: models.User = Depends(deps.get_current_active_user),
 ):
     """
-    ## 🗳️ 對清單項目投票
+    **對清單項目投票**
 
     為 PRIORITY 類型清單的項目投票，用於團隊協作決策。
 
-    ### 🔧 功能說明
+    **功能說明:**
     - 對指定的清單項目投票
     - 防止重複投票（每個用戶每個項目只能投票一次）
     - 自動記錄投票用戶和時間
     - 支援即時投票統計
 
-    ### 📝 請求範例
+    **請求範例:**
     ```json
     {
         "list_item_id": 5
     }
     ```
 
-    ### ✅ 成功回應
+    **成功回應:**
     ```json
     {
         "id": 10,
@@ -74,19 +74,17 @@ def create_vote(
     }
     ```
 
-    ### 💡 使用場景
+    **使用場景:**
     - 團隊活動地點選擇投票
     - 產品功能優先級決策
     - 會議時間安排投票
     - 專案方案選擇
 
-    ### ⚠️ 注意事項
+    **注意事項:**
     - 只能對 PRIORITY 類型清單的項目投票
     - 每個項目每個用戶只能投票一次
     - 投票後可以取消，但不能修改
-
-    ### 🔑 權限要求
-    需要對相關日曆有存取權限
+    - 需要對相關日曆有存取權限
     """
     # Check if user has already voted for this item
     existing_vote = vote_crud.get_by_user_and_item(

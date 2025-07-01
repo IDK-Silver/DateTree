@@ -73,6 +73,11 @@ backend/app/
 
 ## Development Guidelines
 
+### Code Style Requirements
+- **No non-text symbols in code**: Avoid using Unicode symbols, emojis, or special characters in Python code comments, variable names, or strings
+- **Documentation files (.md) can use non-ASCII**: Markdown files, including Chinese characters and Unicode symbols, are allowed for better readability
+- Use plain ASCII characters for all Python code elements to ensure compatibility across different systems and editors
+
 ### When Adding New Features
 1. Check existing patterns in similar files (e.g., other CRUD operations)
 2. Update both schemas and models if database changes needed
@@ -95,6 +100,26 @@ For any significant changes, **MUST update documentation FIRST**:
 3. **Create ADR** in `/docs/adr/` for architectural decisions
 4. **Update README.md** status section for completed features
 5. **Update this CLAUDE.md** for process or guideline changes
+
+### Git Commit Guidelines
+**NEVER automatically commit changes** unless explicitly requested by the user. Instead:
+
+1. **Complete the work** requested by the user
+2. **At appropriate milestones**, proactively suggest committing:
+   - After completing a significant feature
+   - After fixing important bugs
+   - After updating documentation
+   - After adding comprehensive tests
+   - Before starting major refactoring
+
+3. **Suggested commit prompts**:
+   - "Would you like me to create a git commit for the new API implementation?"
+   - "Should I commit these test improvements and documentation updates?"
+   - "Ready to commit the bug fixes and enhancements?"
+
+4. **Always prepare commit messages** when suggesting, but wait for user approval
+
+5. **Exception**: Only auto-commit when user explicitly says "commit this" or "git commit"
 
 ### Testing Approach
 - Tests use SQLite in-memory database (not PostgreSQL)

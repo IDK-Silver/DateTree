@@ -7,56 +7,56 @@ from app.api.v1.api import api_router
 app = FastAPI(
     title=settings.PROJECT_NAME,
     description="""
-    ## 🌳 DateTree - 協作任務與事件管理 API
+    ## DateTree - Collaborative Task and Event Management API
 
-    DateTree 是一個現代化的協作任務和事件管理系統，支援團隊投票決策和個人任務追蹤。
+    DateTree is a modern collaborative task and event management system that supports team voting decisions and personal task tracking.
 
-    ### 🚀 主要功能
+    ### Main Features
 
-    * **👤 用戶管理**: 用戶註冊、登入、JWT 認證
-    * **📅 日曆系統**: 個人和共享日曆管理
-    * **📋 清單管理**: TODO 和 PRIORITY 兩種清單類型
-    * **✅ 任務追蹤**: 清單項目的完成狀態管理
-    * **🗳️ 協作投票**: PRIORITY 清單支援團隊投票決策
-    * **📆 事件管理**: 行程安排和時間管理
+    * **User Management**: User registration, login, JWT authentication
+    * **Calendar System**: Personal and shared calendar management
+    * **List Management**: TODO and PRIORITY list types
+    * **Task Tracking**: Completion status management for list items
+    * **Collaborative Voting**: PRIORITY lists support team voting decisions
+    * **Event Management**: Schedule planning and time management
 
-    ### 🏗️ 資料結構
+    ### Data Structure
 
     ```
-    User (用戶)
-    └── Calendar (日曆) [1:N]
-        ├── List (清單) [1:N]
-        │   └── ListItem (清單項目) [1:N]
-        │       └── Vote (投票) [1:N]
-        └── Event (事件) [1:N]
+    User
+    `-- Calendar [1:N]
+        |-- List [1:N]
+        |   `-- ListItem [1:N]
+        |       `-- Vote [1:N]
+        `-- Event [1:N]
     ```
 
-    ### 🔧 如何開始
+    ### Getting Started
 
-    1. **註冊用戶**: 使用 `/api/v1/users/register` 建立帳號
-    2. **登入取得 Token**: 使用 `/api/v1/auth/login` 獲得認證令牌
-    3. **建立日曆**: 註冊時自動建立個人日曆，可手動建立專案日曆
-    4. **管理清單**: 在日曆中建立 TODO 或 PRIORITY 類型清單
-    5. **協作投票**: 在 PRIORITY 清單中進行團隊決策投票
-    6. **規劃事件**: 建立時程安排和提醒
+    1. **Register User**: Use `/api/v1/users/register` to create account
+    2. **Login for Token**: Use `/api/v1/auth/login` to get authentication token
+    3. **Create Calendar**: Personal calendar auto-created on registration, manually create project calendars
+    4. **Manage Lists**: Create TODO or PRIORITY type lists in calendars
+    5. **Collaborative Voting**: Conduct team decision voting in PRIORITY lists
+    6. **Plan Events**: Create schedules and reminders
 
-    ### 🔑 認證方式
+    ### Authentication
 
-    大部分 API 需要 JWT Token 認證，請在 Header 中包含：
+    Most APIs require JWT Token authentication. Include in header:
     ```
     Authorization: Bearer <your-jwt-token>
     ```
 
-    ### 💡 使用建議
+    ### Usage Recommendations
 
-    * **個人任務管理**: 使用個人日曆 + TODO 清單
-    * **團隊協作決策**: 使用共享日曆 + PRIORITY 清單 + 投票系統
-    * **專案管理**: 混合使用多種清單類型 + 事件時程規劃
+    * **Personal Task Management**: Use personal calendar + TODO lists
+    * **Team Collaboration**: Use shared calendar + PRIORITY lists + voting system
+    * **Project Management**: Mix different list types + event scheduling
 
-    ### 📚 相關文檔
+    ### Related Documentation
 
-    * [完整 API 文檔](https://github.com/your-repo/DateTree/blob/main/docs/api/rest-api.md)
-    * [工作流程範例](https://github.com/your-repo/DateTree/blob/main/docs/api/api-workflow-examples.md)
+    * [Complete API Documentation](https://github.com/your-repo/DateTree/blob/main/docs/api/rest-api.md)
+    * [Workflow Examples](https://github.com/your-repo/DateTree/blob/main/docs/api/api-workflow-examples.md)
     """,
     version="1.0.0",
     contact={
