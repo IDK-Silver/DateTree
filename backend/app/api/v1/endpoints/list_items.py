@@ -19,8 +19,10 @@ def read_list_items(
 ):
     """
     Retrieve list items for a specific list.
-    TODO: Add permission check to ensure user has access to the list.
     """
+    # Check if user has access to the list
+    deps.check_list_access(db=db, list_id=list_id, user=current_user)
+    
     items = list_item_crud.get_multi_by_list(
         db, list_id=list_id, skip=skip, limit=limit
     )
@@ -83,6 +85,9 @@ def read_list_items_with_votes(
     ### 🎯 特別適用
     此端點特別適合 PRIORITY 類型清單，可以清楚看到團隊投票的結果分佈。
     """
+    # Check if user has access to the list
+    deps.check_list_access(db=db, list_id=list_id, user=current_user)
+    
     items_with_votes = list_item_crud.get_multi_with_vote_counts(
         db, list_id=list_id, skip=skip, limit=limit
     )
@@ -115,7 +120,9 @@ def read_list_item(
     item = list_item_crud.get(db=db, id=item_id)
     if not item:
         raise HTTPException(status_code=404, detail="List item not found")
-    # TODO: Add permission check
+    
+    # Check if user has access to the list
+    deps.check_list_access(db=db, list_id=item.list_id, user=current_user)
     return item
 
 @router.post("/", response_model=list_item_schemas.ListItem)
@@ -128,7 +135,9 @@ def create_list_item(
     """
     Create a new list item.
     """
-    # TODO: Add permission check to ensure user has access to the list
+    # Check if user has access to the list
+    deps.check_list_access(db=db, list_id=item_in.list_id, user=current_user)
+    
     item = list_item_crud.create_with_user(
         db=db, obj_in=item_in, creator_id=current_user.id
     )
@@ -148,7 +157,10 @@ def update_list_item(
     item = list_item_crud.get(db=db, id=item_id)
     if not item:
         raise HTTPException(status_code=404, detail="List item not found")
-    # TODO: Add permission check
+    
+    # Check if user has access to the list
+    deps.check_list_access(db=db, list_id=item.list_id, user=current_user)
+    
     item = list_item_crud.update(db=db, db_obj=item, obj_in=item_in)
     return item
 
@@ -165,6 +177,9 @@ def delete_list_item(
     item = list_item_crud.get(db=db, id=item_id)
     if not item:
         raise HTTPException(status_code=404, detail="List item not found")
-    # TODO: Add permission check
+    
+    # Check if user has access to the list
+    deps.check_list_access(db=db, list_id=item.list_id, user=current_user)
+    
     item = list_item_crud.remove(db=db, id=item_id)
     return item

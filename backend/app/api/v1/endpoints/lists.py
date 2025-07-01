@@ -135,7 +135,6 @@ def create_list(
     # You can now use current_user.id for permission checks or to record the operator.
     # For example, check if the current_user has permission to create a list
     # in the specified list_in.calendar_id.
-    print(f"User {current_user.email} is creating a list.")
     
     list_obj = list_crud.create(db=db, obj_in=list_in)
     return list_obj

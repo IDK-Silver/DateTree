@@ -20,8 +20,10 @@ def read_events_by_calendar(
 ):
     """
     Retrieve events for a specific calendar.
-    TODO: Add permission check to ensure user has access to the calendar.
     """
+    # Check if user has access to the calendar
+    deps.check_calendar_access(db=db, calendar_id=calendar_id, user=current_user)
+    
     events = event_crud.get_multi_by_calendar(
         db, calendar_id=calendar_id, skip=skip, limit=limit
     )
@@ -79,7 +81,9 @@ def read_event(
     event = event_crud.get(db=db, id=event_id)
     if not event:
         raise HTTPException(status_code=404, detail="Event not found")
-    # TODO: Add permission check
+    
+    # Check if user has access to the calendar
+    deps.check_calendar_access(db=db, calendar_id=event.calendar_id, user=current_user)
     return event
 
 @router.post("/", response_model=event_schemas.Event)
@@ -92,7 +96,9 @@ def create_event(
     """
     Create a new event.
     """
-    # TODO: Add permission check to ensure user has access to the calendar
+    # Check if user has access to the calendar
+    deps.check_calendar_access(db=db, calendar_id=event_in.calendar_id, user=current_user)
+    
     event = event_crud.create_with_user(
         db=db, obj_in=event_in, creator_id=current_user.id
     )
@@ -112,7 +118,10 @@ def update_event(
     event = event_crud.get(db=db, id=event_id)
     if not event:
         raise HTTPException(status_code=404, detail="Event not found")
-    # TODO: Add permission check
+    
+    # Check if user has access to the calendar
+    deps.check_calendar_access(db=db, calendar_id=event.calendar_id, user=current_user)
+    
     event = event_crud.update(db=db, db_obj=event, obj_in=event_in)
     return event
 
@@ -129,6 +138,9 @@ def delete_event(
     event = event_crud.get(db=db, id=event_id)
     if not event:
         raise HTTPException(status_code=404, detail="Event not found")
-    # TODO: Add permission check
+    
+    # Check if user has access to the calendar
+    deps.check_calendar_access(db=db, calendar_id=event.calendar_id, user=current_user)
+    
     event = event_crud.remove(db=db, id=event_id)
     return event

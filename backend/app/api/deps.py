@@ -71,3 +71,51 @@ def get_current_active_user(
     if not current_user.is_active:
         raise HTTPException(status_code=400, detail="Inactive user")
     return current_user
+
+
+def check_calendar_access(
+    db: Session, calendar_id: int, user: models.User
+) -> models.Calendar:
+    """
+    Check if user has access to the calendar.
+    Returns the calendar if user has access, raises HTTPException otherwise.
+    """
+    calendar = crud.calendar.get(db=db, id=calendar_id)
+    if not calendar:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Calendar not found"
+        )
+    
+    # Check if user is owner or member
+    if calendar.owner_id == user.id:
+        return calendar
+    
+    # Check if user is a member
+    for member in calendar.members:
+        if member.id == user.id:
+            return calendar
+    
+    raise HTTPException(
+        status_code=status.HTTP_403_FORBIDDEN,
+        detail="Not enough permissions to access this calendar"
+    )
+
+
+def check_list_access(
+    db: Session, list_id: int, user: models.User
+) -> models.List:
+    """
+    Check if user has access to the list through calendar access.
+    Returns the list if user has access, raises HTTPException otherwise.
+    """
+    list_obj = crud.list_crud.get(db=db, id=list_id)
+    if not list_obj:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="List not found"
+        )
+    
+    # Check calendar access
+    check_calendar_access(db=db, calendar_id=list_obj.calendar_id, user=user)
+    return list_obj

@@ -1,11 +1,12 @@
 from typing import Any, List as ListTyping
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Request
 from sqlalchemy.orm import Session
 
-from app import models
+from app import models, crud
 from app.crud import vote as vote_crud
 from app.schemas import vote as vote_schemas
 from app.api import deps
+from app.core.rate_limiter import vote_rate_limit
 
 router = APIRouter()
 
@@ -43,9 +44,11 @@ def read_my_votes(
 @router.post("/", response_model=vote_schemas.Vote)
 def create_vote(
     *,
+    request: Request,
     db: Session = Depends(deps.get_db),
     vote_in: vote_schemas.VoteCreate,
     current_user: models.User = Depends(deps.get_current_active_user),
+    _: None = Depends(vote_rate_limit)
 ):
     """
     **對清單項目投票**
@@ -97,7 +100,13 @@ def create_vote(
             detail="User has already voted for this item"
         )
     
-    # TODO: Add permission check to ensure user has access to the list
+    # Check if user has access to the list through the list item
+    list_item = crud.list_item_crud.get(db=db, id=vote_in.list_item_id)
+    if not list_item:
+        raise HTTPException(status_code=404, detail="List item not found")
+    
+    deps.check_list_access(db=db, list_id=list_item.list_id, user=current_user)
+    
     vote = vote_crud.create_with_user(
         db=db, obj_in=vote_in, user_id=current_user.id
     )
