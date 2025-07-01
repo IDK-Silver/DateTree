@@ -15,7 +15,9 @@
 - [ADR-002: 採用擴展式多清單模型](adr/002-adopt-extendable-multi-list-model.md)
 - [ADR-003: 資料庫遷移重置策略](adr/003-database-migration-reset-strategy.md)
 - [ADR-004: 預設個人日曆設計](adr/004-default-personal-calendar.md)
-- [ADR-005: 資料庫效能優化策略](adr/005-database-performance-optimization-strategy.md) ⭐ **New**
+- [ADR-005: 資料庫效能優化策略](adr/005-database-performance-optimization-strategy.md)
+- [ADR-006: 前端技術棧選擇策略](adr/006-frontend-technology-stack-selection.md)
+- [ADR-007: Flutter 應用 UI 架構設計](adr/007-flutter-app-ui-architecture-design.md) ⭐ **New**
 
 ### 🔧 開發指南 (`guides/`)
 
@@ -38,6 +40,11 @@
 
 - [REST API 規格](api/rest-api.md) - 完整的 API 端點參考
 - [API 使用範例](api/examples.md) - 實際使用範例和最佳實踐
+
+### 🎨 UI 設計模擬 (`mockups/`)
+
+- [Todo 頁面模擬](mockups/todo-mockup.html) - 完整的 Todo 頁面 UI 互動模擬
+- [Calendar 頁面模擬](mockups/calendar-mockup.html) - Calendar 頁面視覺化設計模擬
 
 ## 🎯 快速導航
 
