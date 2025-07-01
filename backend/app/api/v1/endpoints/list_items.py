@@ -35,7 +35,53 @@ def read_list_items_with_votes(
     current_user: models.User = Depends(deps.get_current_active_user),
 ):
     """
-    Retrieve list items with vote counts for a specific list.
+    ## 🗳️ 取得帶投票數的清單項目
+
+    取得指定清單的所有項目，並包含每個項目的投票統計。特別適用於 PRIORITY 類型清單的決策分析。
+
+    ### 🔧 功能說明
+    - 返回清單中的所有項目
+    - 包含每個項目的投票總數
+    - 依照投票數排序（高到低）
+    - 支援分頁查詢
+
+    ### 📊 查詢參數
+    - `list_id`: 清單 ID（路徑參數）
+    - `skip`: 跳過筆數（分頁用）
+    - `limit`: 返回筆數上限
+
+    ### ✅ 成功回應
+    ```json
+    [
+        {
+            "id": 5,
+            "content": "九份老街探索",
+            "is_completed": false,
+            "list_id": 2,
+            "creator_id": 3,
+            "created_at": "2025-07-01T10:30:00Z",
+            "vote_count": 8
+        },
+        {
+            "id": 6,
+            "content": "陽明山健行",
+            "is_completed": false,
+            "list_id": 2,
+            "creator_id": 2,
+            "created_at": "2025-07-01T10:45:00Z",
+            "vote_count": 5
+        }
+    ]
+    ```
+
+    ### 💡 使用場景
+    - 檢視投票結果和排名
+    - 分析團隊偏好
+    - 決策制定參考
+    - 投票進度追蹤
+
+    ### 🎯 特別適用
+    此端點特別適合 PRIORITY 類型清單，可以清楚看到團隊投票的結果分佈。
     """
     items_with_votes = list_item_crud.get_multi_with_vote_counts(
         db, list_id=list_id, skip=skip, limit=limit
