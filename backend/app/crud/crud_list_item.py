@@ -1,4 +1,4 @@
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload, selectinload
 from typing import List as ListTyping, Optional
 from sqlalchemy import func
 
@@ -61,6 +61,22 @@ class CRUDListItem(CRUDBase[ListItem, ListItemCreate, ListItemUpdate]):
             .outerjoin(Vote, ListItem.id == Vote.list_item_id)
             .filter(ListItem.list_id == list_id)
             .group_by(ListItem.id)
+            .offset(skip)
+            .limit(limit)
+            .all()
+        )
+    
+    def get_multi_with_votes_eager(
+        self, db: Session, *, list_id: int, skip: int = 0, limit: int = 100
+    ) -> ListTyping[ListItem]:
+        """
+        Get list items with votes eagerly loaded using selectinload.
+        More efficient than get_multi_with_vote_counts for full vote data.
+        """
+        return (
+            db.query(self.model)
+            .options(selectinload(ListItem.votes))
+            .filter(ListItem.list_id == list_id)
             .offset(skip)
             .limit(limit)
             .all()

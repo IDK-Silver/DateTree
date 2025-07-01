@@ -79,27 +79,46 @@ def check_calendar_access(
     """
     Check if user has access to the calendar.
     Returns the calendar if user has access, raises HTTPException otherwise.
+    Uses optimized JOIN query instead of N+1 queries.
     """
-    calendar = crud.calendar.get(db=db, id=calendar_id)
-    if not calendar:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Calendar not found"
+    from sqlalchemy import or_
+    from app.models.calendar import calendar_user_association
+    
+    # Single query to check calendar existence and user access
+    calendar = (
+        db.query(models.Calendar)
+        .outerjoin(
+            calendar_user_association, 
+            models.Calendar.id == calendar_user_association.c.calendar_id
         )
-    
-    # Check if user is owner or member
-    if calendar.owner_id == user.id:
-        return calendar
-    
-    # Check if user is a member
-    for member in calendar.members:
-        if member.id == user.id:
-            return calendar
-    
-    raise HTTPException(
-        status_code=status.HTTP_403_FORBIDDEN,
-        detail="Not enough permissions to access this calendar"
+        .filter(
+            models.Calendar.id == calendar_id,
+            or_(
+                models.Calendar.owner_id == user.id,  # User is owner
+                calendar_user_association.c.user_id == user.id  # User is member
+            )
+        )
+        .first()
     )
+    
+    if not calendar:
+        # Check if calendar exists at all to provide better error message
+        calendar_exists = db.query(models.Calendar).filter(
+            models.Calendar.id == calendar_id
+        ).first()
+        
+        if not calendar_exists:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Calendar not found"
+            )
+        else:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Not enough permissions to access this calendar"
+            )
+    
+    return calendar
 
 
 def check_list_access(
@@ -108,14 +127,44 @@ def check_list_access(
     """
     Check if user has access to the list through calendar access.
     Returns the list if user has access, raises HTTPException otherwise.
+    Uses optimized JOIN query to check both list and calendar access in one query.
     """
-    list_obj = crud.list_crud.get(db=db, id=list_id)
-    if not list_obj:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="List not found"
-        )
+    from sqlalchemy import or_
+    from app.models.calendar import calendar_user_association
     
-    # Check calendar access
-    check_calendar_access(db=db, calendar_id=list_obj.calendar_id, user=user)
+    # Single query to check list existence and user access through calendar
+    list_obj = (
+        db.query(models.List)
+        .join(models.Calendar, models.List.calendar_id == models.Calendar.id)
+        .outerjoin(
+            calendar_user_association,
+            models.Calendar.id == calendar_user_association.c.calendar_id
+        )
+        .filter(
+            models.List.id == list_id,
+            or_(
+                models.Calendar.owner_id == user.id,  # User owns calendar
+                calendar_user_association.c.user_id == user.id  # User is member
+            )
+        )
+        .first()
+    )
+    
+    if not list_obj:
+        # Check if list exists at all to provide better error message
+        list_exists = db.query(models.List).filter(
+            models.List.id == list_id
+        ).first()
+        
+        if not list_exists:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="List not found"
+            )
+        else:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Not enough permissions to access this list"
+            )
+    
     return list_obj

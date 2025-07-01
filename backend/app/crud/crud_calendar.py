@@ -1,5 +1,5 @@
 # backend/app/crud/crud_calendar.py
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload, selectinload
 from typing import List as ListTyping
 
 from app.crud.base import CRUDBase
@@ -35,6 +35,41 @@ class CRUDCalendar(CRUDBase[Calendar, CalendarCreate, CalendarUpdate]):
             .offset(skip)
             .limit(limit)
             .all()
+        )
+    
+    def get_with_lists_and_events(
+        self, db: Session, *, calendar_id: int
+    ) -> Calendar:
+        """
+        Get calendar with all lists and events eagerly loaded.
+        Reduces N+1 queries when displaying calendar overview.
+        """
+        return (
+            db.query(Calendar)
+            .options(
+                selectinload(Calendar.lists),
+                selectinload(Calendar.events)
+            )
+            .filter(Calendar.id == calendar_id)
+            .first()
+        )
+    
+    def get_with_full_data(
+        self, db: Session, *, calendar_id: int
+    ) -> Calendar:
+        """
+        Get calendar with all related data eagerly loaded.
+        Includes lists with items and votes, events, and members.
+        """
+        return (
+            db.query(Calendar)
+            .options(
+                selectinload(Calendar.lists).selectinload("items").selectinload("votes"),
+                selectinload(Calendar.events),
+                selectinload(Calendar.members)
+            )
+            .filter(Calendar.id == calendar_id)
+            .first()
         )
 
 calendar_crud = CRUDCalendar(Calendar)

@@ -18,7 +18,7 @@ class List(Base):
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String, nullable=False)
     list_type = Column(Enum(ListType), nullable=False, name="list_type_enum")
-    calendar_id = Column(Integer, ForeignKey("calendars.id"), nullable=False)
+    calendar_id = Column(Integer, ForeignKey("calendars.id"), nullable=False, index=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
 
     calendar = relationship("Calendar", back_populates="lists")

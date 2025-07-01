@@ -36,7 +36,7 @@ class Calendar(Base):
     name = Column(String, nullable=False)
     description = Column(Text, nullable=True)
     calendar_type = Column(Enum(CalendarType), nullable=False, default=CalendarType.GENERAL)
-    owner_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    owner_id = Column(Integer, ForeignKey("users.id"), nullable=False, index=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
 
     owner = relationship("User")

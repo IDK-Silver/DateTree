@@ -183,6 +183,7 @@ class TestListItemAPI:
             "list_id": 999999
         }
         
-        # Note: SQLite test DB doesn't enforce foreign key constraints
+        # Now properly validates list existence and permissions in application layer
         response = authenticated_client.post("/api/v1/list-items/", json=item_data)
-        assert response.status_code == 200
+        assert response.status_code == 404
+        assert "List not found" in response.json()["detail"]

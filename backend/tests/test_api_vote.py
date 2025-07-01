@@ -119,8 +119,9 @@ class TestVoteAPI:
         }
         
         response = authenticated_client.post("/api/v1/votes/", json=vote_data)
-        # Note: SQLite test DB doesn't enforce foreign key constraints
-        assert response.status_code == 200
+        # Now properly validates list item existence in application layer
+        assert response.status_code == 404
+        assert "List item not found" in response.json()["detail"]
 
     def test_vote_counting_integration(self, authenticated_client: TestClient, test_list: models.List):
         """Test that vote counts are correctly reflected in list item queries."""

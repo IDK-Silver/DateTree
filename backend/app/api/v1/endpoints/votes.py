@@ -100,12 +100,12 @@ def create_vote(
             detail="User has already voted for this item"
         )
     
-    # Check if user has access to the list through the list item
-    list_item = crud.list_item_crud.get(db=db, id=vote_in.list_item_id)
-    if not list_item:
+    # Check if user has access to the list through the list item  
+    list_item_obj = crud.list_item.get(db=db, id=vote_in.list_item_id)
+    if not list_item_obj:
         raise HTTPException(status_code=404, detail="List item not found")
     
-    deps.check_list_access(db=db, list_id=list_item.list_id, user=current_user)
+    deps.check_list_access(db=db, list_id=list_item_obj.list_id, user=current_user)
     
     vote = vote_crud.create_with_user(
         db=db, obj_in=vote_in, user_id=current_user.id
