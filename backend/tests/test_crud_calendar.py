@@ -86,5 +86,5 @@ class TestCalendarCRUD:
 
         calendars = calendar_crud.get_multi_by_owner(db=db_session, owner_id=test_user.id)
         
-        assert len(calendars) == 4
+        assert len(calendars) == 5  # 3 created in test + 1 personal + 1 test calendar from fixtures
         assert all(c.owner_id == test_user.id for c in calendars)
