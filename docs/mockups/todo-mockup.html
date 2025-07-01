@@ -1,0 +1,713 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DateTree - Todo 頁面模擬</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f5f5f5;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* AppBar */
+        .app-bar {
+            background: #2196F3;
+            color: white;
+            padding: 12px 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .app-bar h1 {
+            font-size: 20px;
+            font-weight: 600;
+        }
+
+        .app-bar-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .icon-button {
+            background: none;
+            border: none;
+            color: white;
+            padding: 8px;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .icon-button:hover {
+            background: rgba(255,255,255,0.1);
+        }
+
+        /* Tab Bar */
+        .tab-bar {
+            background: white;
+            border-bottom: 1px solid #e0e0e0;
+            display: flex;
+            align-items: center;
+        }
+
+        .tab-container {
+            flex: 1;
+            overflow-x: auto;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+
+        .tab-container::-webkit-scrollbar {
+            display: none;
+        }
+
+        .tab-list {
+            display: flex;
+            min-width: 100%;
+        }
+
+        .global-add-button {
+            flex-shrink: 0;
+            padding: 8px 16px;
+            margin: 8px;
+            background: #2196F3;
+            color: white;
+            border: none;
+            border-radius: 20px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 36px;
+            height: 36px;
+        }
+
+        .global-add-button:hover {
+            background: #1976D2;
+            transform: scale(1.05);
+        }
+
+        .tab {
+            flex: none;
+            padding: 12px 16px;
+            border-bottom: 2px solid transparent;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            color: #666;
+        }
+
+        .tab.active {
+            color: #2196F3;
+            border-bottom-color: #2196F3;
+        }
+
+        .calendar-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        .dot-personal { background: #4CAF50; }
+        .dot-lover { background: #E91E63; }
+        .dot-friends { background: #FF9800; }
+        .dot-work { background: #9C27B0; }
+
+        .unread-badge {
+            background: #f44336;
+            color: white;
+            border-radius: 10px;
+            padding: 2px 6px;
+            font-size: 10px;
+            min-width: 16px;
+            text-align: center;
+        }
+
+        /* Content Area */
+        .content {
+            flex: 1;
+            overflow-y: auto;
+            background: #f5f5f5;
+        }
+
+        .calendar-info {
+            background: white;
+            margin: 8px 16px;
+            padding: 12px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .calendar-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+
+        .calendar-details h3 {
+            font-size: 16px;
+            color: #333;
+            margin-bottom: 2px;
+        }
+
+        .calendar-meta {
+            font-size: 12px;
+            color: #666;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        /* Todo Sections */
+        .todo-section {
+            margin: 16px;
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 8px;
+            padding: 0 4px;
+        }
+
+        .section-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .section-count {
+            background: #e0e0e0;
+            color: #666;
+            border-radius: 12px;
+            padding: 2px 8px;
+            font-size: 12px;
+        }
+
+        /* Todo Items */
+        .todo-item {
+            background: white;
+            margin-bottom: 8px;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            overflow: hidden;
+            position: relative;
+        }
+
+        .todo-content {
+            padding: 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .todo-checkbox {
+            width: 20px;
+            height: 20px;
+            border: 2px solid #ddd;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.2s;
+            flex-shrink: 0;
+        }
+
+        .todo-checkbox:hover {
+            border-color: #4CAF50;
+        }
+
+        .todo-checkbox.completed {
+            background: #4CAF50;
+            border-color: #4CAF50;
+            position: relative;
+        }
+
+        .todo-checkbox.completed::after {
+            content: '✓';
+            color: white;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 12px;
+        }
+
+        .todo-text {
+            flex: 1;
+        }
+
+        .todo-title {
+            font-size: 16px;
+            color: #333;
+            margin-bottom: 4px;
+            line-height: 1.3;
+        }
+
+        .todo-meta {
+            font-size: 12px;
+            color: #666;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .todo-item.completed .todo-title {
+            text-decoration: line-through;
+            color: #999;
+        }
+
+        .todo-more {
+            padding: 8px;
+            border-radius: 50%;
+            cursor: pointer;
+            color: #666;
+            transition: background 0.2s;
+        }
+
+        .todo-more:hover {
+            background: #f0f0f0;
+        }
+
+        /* Completed Section */
+        .completed-section {
+            margin-top: 24px;
+        }
+
+        .collapse-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 4px;
+            cursor: pointer;
+            color: #666;
+        }
+
+        .collapse-icon {
+            transition: transform 0.2s;
+        }
+
+        .collapse-icon.expanded {
+            transform: rotate(90deg);
+        }
+
+        .completed-items {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+
+        .completed-items.expanded {
+            max-height: 500px;
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 48px 24px;
+            color: #666;
+        }
+
+        .empty-icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+            opacity: 0.5;
+        }
+
+        .empty-title {
+            font-size: 18px;
+            margin-bottom: 8px;
+        }
+
+        .empty-subtitle {
+            font-size: 14px;
+            margin-bottom: 24px;
+        }
+
+        .empty-button {
+            background: #2196F3;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 24px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .empty-button:hover {
+            background: #1976D2;
+        }
+
+        /* Bottom Navigation */
+        .bottom-nav {
+            background: white;
+            border-top: 1px solid #e0e0e0;
+            display: flex;
+            height: 60px;
+            position: relative;
+        }
+
+        .nav-item {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: color 0.2s;
+            color: #666;
+            font-size: 12px;
+            gap: 4px;
+        }
+
+        .nav-item.active {
+            color: #2196F3;
+        }
+
+        .nav-icon {
+            font-size: 20px;
+        }
+
+        /* FAB */
+        .fab {
+            position: absolute;
+            bottom: 80px;
+            right: 16px;
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background: #2196F3;
+            color: white;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(33, 150, 243, 0.4);
+            transition: transform 0.2s;
+        }
+
+        .fab:hover {
+            transform: scale(1.05);
+        }
+
+        /* Swipe Actions Hint */
+        .swipe-hint {
+            position: absolute;
+            top: 50%;
+            right: 16px;
+            transform: translateY(-50%);
+            color: #ddd;
+            font-size: 12px;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+
+        .todo-item:hover .swipe-hint {
+            opacity: 1;
+        }
+
+        /* Responsive */
+        @media (max-width: 480px) {
+            .calendar-info {
+                margin: 4px 8px;
+            }
+            
+            .todo-section {
+                margin: 8px;
+            }
+            
+            .fab {
+                bottom: 70px;
+                right: 12px;
+            }
+        }
+
+        /* Loading Skeleton */
+        .skeleton {
+            background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+            background-size: 200% 100%;
+            animation: loading 1.5s infinite;
+        }
+
+        @keyframes loading {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+    </style>
+</head>
+<body>
+    <!-- App Bar -->
+    <div class="app-bar">
+        <h1>Todo</h1>
+        <div class="app-bar-actions">
+            <button class="icon-button" title="搜尋">🔍</button>
+        </div>
+    </div>
+
+    <!-- Tab Bar -->
+    <div class="tab-bar">
+        <div class="tab-container">
+            <div class="tab-list">
+                <div class="tab active">
+                    <div class="calendar-dot dot-personal"></div>
+                    <span>個人</span>
+                </div>
+                <div class="tab">
+                    <div class="calendar-dot dot-lover"></div>
+                    <span>戀人</span>
+                    <div class="unread-badge">2</div>
+                </div>
+                <div class="tab">
+                    <div class="calendar-dot dot-friends"></div>
+                    <span>朋友</span>
+                </div>
+                <div class="tab">
+                    <div class="calendar-dot dot-work"></div>
+                    <span>工作</span>
+                    <div class="unread-badge">5</div>
+                </div>
+            </div>
+        </div>
+        <button class="global-add-button" title="全局新增">+</button>
+    </div>
+
+    <!-- Content -->
+    <div class="content">
+        <!-- Calendar Info -->
+        <div class="calendar-info">
+            <div class="calendar-avatar dot-personal">個</div>
+            <div class="calendar-details">
+                <h3>個人日曆</h3>
+                <div class="calendar-meta">
+                    <span>👤 只有你</span>
+                    <span>•</span>
+                    <span>3 個待辦事項</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pending Todos Section -->
+        <div class="todo-section">
+            <div class="section-header">
+                <span class="section-title">📋 待辦事項</span>
+                <span class="section-count">3</span>
+            </div>
+
+            <!-- Todo Items -->
+            <div class="todo-item">
+                <div class="todo-content">
+                    <div class="todo-checkbox"></div>
+                    <div class="todo-text">
+                        <div class="todo-title">去超市買牛奶和雞蛋</div>
+                        <div class="todo-meta">
+                            <span>今天 14:30</span>
+                            <span>•</span>
+                            <span>個人日曆</span>
+                        </div>
+                    </div>
+                    <div class="todo-more">⋮</div>
+                </div>
+                <div class="swipe-hint">← 滑動操作</div>
+            </div>
+
+            <div class="todo-item">
+                <div class="todo-content">
+                    <div class="todo-checkbox"></div>
+                    <div class="todo-text">
+                        <div class="todo-title">準備週末旅遊的行李</div>
+                        <div class="todo-meta">
+                            <span>明天</span>
+                            <span>•</span>
+                            <span>個人日曆</span>
+                        </div>
+                    </div>
+                    <div class="todo-more">⋮</div>
+                </div>
+                <div class="swipe-hint">← 滑動操作</div>
+            </div>
+
+            <div class="todo-item">
+                <div class="todo-content">
+                    <div class="todo-checkbox"></div>
+                    <div class="todo-text">
+                        <div class="todo-title">更新履歷和作品集</div>
+                        <div class="todo-meta">
+                            <span>下週一</span>
+                            <span>•</span>
+                            <span>個人日曆</span>
+                        </div>
+                    </div>
+                    <div class="todo-more">⋮</div>
+                </div>
+                <div class="swipe-hint">← 滑動操作</div>
+            </div>
+        </div>
+
+        <!-- Completed Section -->
+        <div class="todo-section completed-section">
+            <div class="collapse-header" onclick="toggleCompleted()">
+                <span class="collapse-icon">▶</span>
+                <span class="section-title">✅ 已完成</span>
+                <span class="section-count">2</span>
+            </div>
+
+            <div class="completed-items" id="completedItems">
+                <div class="todo-item completed">
+                    <div class="todo-content">
+                        <div class="todo-checkbox completed"></div>
+                        <div class="todo-text">
+                            <div class="todo-title">繳交水電費</div>
+                            <div class="todo-meta">
+                                <span>昨天完成</span>
+                                <span>•</span>
+                                <span>個人日曆</span>
+                            </div>
+                        </div>
+                        <div class="todo-more">⋮</div>
+                    </div>
+                </div>
+
+                <div class="todo-item completed">
+                    <div class="todo-content">
+                        <div class="todo-checkbox completed"></div>
+                        <div class="todo-text">
+                            <div class="todo-title">預約牙醫複診</div>
+                            <div class="todo-meta">
+                                <span>3 天前完成</span>
+                                <span>•</span>
+                                <span>個人日曆</span>
+                            </div>
+                        </div>
+                        <div class="todo-more">⋮</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- FAB -->
+    <button class="fab" title="新增待辦事項">+</button>
+
+    <!-- Bottom Navigation -->
+    <div class="bottom-nav">
+        <div class="nav-item active">
+            <div class="nav-icon">📋</div>
+            <span>Todo</span>
+        </div>
+        <div class="nav-item">
+            <div class="nav-icon">🗳️</div>
+            <span>Vote</span>
+        </div>
+        <div class="nav-item">
+            <div class="nav-icon">📅</div>
+            <span>Calendar</span>
+        </div>
+        <div class="nav-item">
+            <div class="nav-icon">👤</div>
+            <span>Profile</span>
+        </div>
+    </div>
+
+    <script>
+        function toggleCompleted() {
+            const items = document.getElementById('completedItems');
+            const icon = document.querySelector('.collapse-icon');
+            
+            if (items.classList.contains('expanded')) {
+                items.classList.remove('expanded');
+                icon.classList.remove('expanded');
+            } else {
+                items.classList.add('expanded');
+                icon.classList.add('expanded');
+            }
+        }
+
+        // Tab switching
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', function() {
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                this.classList.add('active');
+                
+                // 模擬 Tab 切換後的內容變化
+                const tabName = this.querySelector('span').textContent;
+                console.log(`切換到 ${tabName} 日曆`);
+            });
+        });
+
+        // Todo item interactions
+        document.querySelectorAll('.todo-checkbox').forEach(checkbox => {
+            checkbox.addEventListener('click', function() {
+                const todoItem = this.closest('.todo-item');
+                if (this.classList.contains('completed')) {
+                    this.classList.remove('completed');
+                    todoItem.classList.remove('completed');
+                } else {
+                    this.classList.add('completed');
+                    todoItem.classList.add('completed');
+                }
+            });
+        });
+
+        // FAB click
+        document.querySelector('.fab').addEventListener('click', function() {
+            alert('新增待辦事項到 "個人" 日曆');
+        });
+
+        // Global add button click
+        document.querySelector('.global-add-button').addEventListener('click', function() {
+            alert('全局新增 - 可選擇任意日曆和類型');
+        });
+
+        // 模擬下拉刷新
+        let startY = 0;
+        let currentY = 0;
+        let pulling = false;
+
+        document.querySelector('.content').addEventListener('touchstart', function(e) {
+            if (this.scrollTop === 0) {
+                startY = e.touches[0].pageY;
+                pulling = true;
+            }
+        });
+
+        document.querySelector('.content').addEventListener('touchmove', function(e) {
+            if (pulling) {
+                currentY = e.touches[0].pageY;
+                if (currentY > startY + 50) {
+                    console.log('下拉刷新觸發');
+                }
+            }
+        });
+
+        document.querySelector('.content').addEventListener('touchend', function() {
+            pulling = false;
+        });
+    </script>
+</body>
+</html>

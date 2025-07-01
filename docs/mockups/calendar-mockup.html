@@ -1,0 +1,1028 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DateTree - Calendar 頁面模擬</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f5f5f5;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* AppBar */
+        .app-bar {
+            background: #2196F3;
+            color: white;
+            padding: 12px 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .app-bar-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .app-bar h1 {
+            font-size: 20px;
+            font-weight: 600;
+        }
+
+        .filter-status {
+            background: rgba(255,255,255,0.2);
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .app-bar-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .icon-button {
+            background: none;
+            border: none;
+            color: white;
+            padding: 8px;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: background 0.2s;
+            font-size: 16px;
+        }
+
+        .icon-button:hover {
+            background: rgba(255,255,255,0.1);
+        }
+
+        .icon-button.active {
+            background: rgba(255,255,255,0.2);
+        }
+
+        /* View Controls */
+        .view-controls {
+            background: white;
+            border-bottom: 1px solid #e0e0e0;
+            padding: 8px 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .view-toggle {
+            display: flex;
+            background: #f0f0f0;
+            border-radius: 6px;
+            overflow: hidden;
+        }
+
+        .view-button {
+            background: none;
+            border: none;
+            padding: 6px 12px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: #666;
+        }
+
+        .view-button.active {
+            background: #2196F3;
+            color: white;
+        }
+
+        .today-button {
+            background: #2196F3;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 16px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .today-button:hover {
+            background: #1976D2;
+        }
+
+        /* Calendar Header */
+        .calendar-header {
+            background: white;
+            padding: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .month-nav {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .nav-button {
+            background: none;
+            border: none;
+            font-size: 18px;
+            color: #666;
+            cursor: pointer;
+            padding: 4px;
+            border-radius: 50%;
+            transition: background 0.2s;
+        }
+
+        .nav-button:hover {
+            background: #f0f0f0;
+        }
+
+        .month-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+            min-width: 120px;
+            text-align: center;
+        }
+
+        /* Filter Panel */
+        .filter-panel {
+            background: white;
+            border-bottom: 1px solid #e0e0e0;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+
+        .filter-panel.expanded {
+            max-height: 200px;
+        }
+
+        .filter-content {
+            padding: 16px;
+        }
+
+        .filter-section {
+            margin-bottom: 16px;
+        }
+
+        .filter-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 8px;
+        }
+
+        .filter-options {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .filter-chip {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            border: 1px solid #e0e0e0;
+            border-radius: 16px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+            background: white;
+        }
+
+        .filter-chip.selected {
+            background: #e3f2fd;
+            border-color: #2196F3;
+            color: #1976D2;
+        }
+
+        .calendar-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        .dot-personal { background: #4CAF50; }
+        .dot-lover { background: #E91E63; }
+        .dot-friends { background: #FF9800; }
+        .dot-work { background: #9C27B0; }
+
+        .preset-buttons {
+            display: flex;
+            gap: 8px;
+            margin-top: 12px;
+        }
+
+        .preset-button {
+            background: #f5f5f5;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: #666;
+        }
+
+        .preset-button:hover, .preset-button.active {
+            background: #2196F3;
+            color: white;
+        }
+
+        .filter-actions {
+            border-top: 1px solid #f0f0f0;
+            padding-top: 12px;
+            margin-top: 16px;
+        }
+
+        .manage-calendar-button {
+            width: 100%;
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            color: #666;
+            padding: 10px 16px;
+            border-radius: 6px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        .manage-calendar-button:hover {
+            background: #e9ecef;
+            color: #333;
+        }
+
+        .manage-calendar-button::before {
+            content: '⚙️';
+            font-size: 14px;
+        }
+
+        /* Calendar Grid */
+        .calendar-container {
+            flex: 1;
+            overflow-y: auto;
+            background: white;
+        }
+
+        .calendar-weekdays {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            border-bottom: 1px solid #e0e0e0;
+            background: #f8f9fa;
+        }
+
+        .weekday {
+            padding: 8px 4px;
+            text-align: center;
+            font-size: 12px;
+            font-weight: 600;
+            color: #666;
+        }
+
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            min-height: 300px;
+        }
+
+        .calendar-day {
+            border-right: 1px solid #f0f0f0;
+            border-bottom: 1px solid #f0f0f0;
+            min-height: 80px;
+            padding: 4px;
+            cursor: pointer;
+            transition: background 0.2s;
+            position: relative;
+        }
+
+        .calendar-day:hover {
+            background: #f8f9fa;
+        }
+
+        .calendar-day.other-month {
+            color: #ccc;
+            background: #fafafa;
+        }
+
+        .calendar-day.today {
+            background: #e3f2fd;
+        }
+
+        .calendar-day.selected {
+            background: #bbdefb;
+        }
+
+        .day-number {
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 2px;
+            color: #333;
+        }
+
+        .calendar-day.other-month .day-number {
+            color: #ccc;
+        }
+
+        /* Events */
+        .event {
+            background: #2196F3;
+            color: white;
+            padding: 2px 4px;
+            margin-bottom: 2px;
+            border-radius: 3px;
+            font-size: 10px;
+            line-height: 1.2;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .event.todo {
+            background: #4CAF50;
+            border-left: 3px solid #2E7D32;
+        }
+
+        .event.vote {
+            background: #FF9800;
+            border-left: 3px solid #F57C00;
+        }
+
+        .event.personal {
+            border-left: 3px solid #4CAF50;
+        }
+
+        .event.lover {
+            border-left: 3px solid #E91E63;
+        }
+
+        .event.friends {
+            border-left: 3px solid #FF9800;
+        }
+
+        .event.work {
+            border-left: 3px solid #9C27B0;
+        }
+
+        .event:hover {
+            transform: scale(1.02);
+            z-index: 1;
+        }
+
+        .more-events {
+            font-size: 9px;
+            color: #666;
+            cursor: pointer;
+            padding: 1px 2px;
+        }
+
+        /* Bottom Nav */
+        .bottom-nav {
+            background: white;
+            border-top: 1px solid #e0e0e0;
+            display: flex;
+            height: 60px;
+        }
+
+        .nav-item {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: color 0.2s;
+            color: #666;
+            font-size: 12px;
+            gap: 4px;
+        }
+
+        .nav-item.active {
+            color: #2196F3;
+        }
+
+        .nav-icon {
+            font-size: 20px;
+        }
+
+        /* FAB */
+        .fab {
+            position: absolute;
+            bottom: 80px;
+            right: 16px;
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background: #2196F3;
+            color: white;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(33, 150, 243, 0.4);
+            transition: transform 0.2s;
+        }
+
+        .fab:hover {
+            transform: scale(1.05);
+        }
+
+        /* Event Details Modal */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .modal.show {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 8px;
+            padding: 24px;
+            max-width: 300px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .modal-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .close-button {
+            background: none;
+            border: none;
+            font-size: 20px;
+            color: #666;
+            cursor: pointer;
+            padding: 4px;
+        }
+
+        .event-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .event-item {
+            padding: 12px;
+            border-radius: 6px;
+            border-left: 4px solid;
+        }
+
+        .event-item.personal {
+            background: #e8f5e8;
+            border-left-color: #4CAF50;
+        }
+
+        .event-item.lover {
+            background: #fce4ec;
+            border-left-color: #E91E63;
+        }
+
+        .event-item.friends {
+            background: #fff3e0;
+            border-left-color: #FF9800;
+        }
+
+        .event-item.work {
+            background: #f3e5f5;
+            border-left-color: #9C27B0;
+        }
+
+        .event-title {
+            font-weight: 600;
+            margin-bottom: 4px;
+            color: #333;
+        }
+
+        .event-meta {
+            font-size: 12px;
+            color: #666;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Responsive */
+        @media (max-width: 480px) {
+            .calendar-day {
+                min-height: 60px;
+                padding: 2px;
+            }
+            
+            .day-number {
+                font-size: 12px;
+            }
+            
+            .event {
+                font-size: 8px;
+                padding: 1px 2px;
+            }
+            
+            .fab {
+                bottom: 70px;
+                right: 12px;
+                width: 48px;
+                height: 48px;
+                font-size: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- App Bar -->
+    <div class="app-bar">
+        <div class="app-bar-left">
+            <h1>Calendar</h1>
+            <div class="filter-status" id="filterStatus">3 個日曆</div>
+        </div>
+        <div class="app-bar-actions">
+            <button class="icon-button" id="filterToggle" title="篩選器">🎛️</button>
+            <button class="icon-button" title="搜尋">🔍</button>
+        </div>
+    </div>
+
+    <!-- View Controls -->
+    <div class="view-controls">
+        <div class="view-toggle">
+            <button class="view-button active">月</button>
+            <button class="view-button">週</button>
+            <button class="view-button">日</button>
+        </div>
+        <button class="today-button" onclick="goToToday()">今天</button>
+    </div>
+
+    <!-- Filter Panel -->
+    <div class="filter-panel" id="filterPanel">
+        <div class="filter-content">
+            <div class="filter-section">
+                <div class="filter-title">日曆選擇</div>
+                <div class="filter-options">
+                    <div class="filter-chip selected">
+                        <div class="calendar-dot dot-personal"></div>
+                        <span>個人</span>
+                    </div>
+                    <div class="filter-chip selected">
+                        <div class="calendar-dot dot-lover"></div>
+                        <span>戀人</span>
+                    </div>
+                    <div class="filter-chip">
+                        <div class="calendar-dot dot-friends"></div>
+                        <span>朋友</span>
+                    </div>
+                    <div class="filter-chip selected">
+                        <div class="calendar-dot dot-work"></div>
+                        <span>工作</span>
+                    </div>
+                </div>
+                <div class="preset-buttons">
+                    <button class="preset-button">個人模式</button>
+                    <button class="preset-button active">生活模式</button>
+                    <button class="preset-button">社交模式</button>
+                    <button class="preset-button">工作模式</button>
+                </div>
+            </div>
+            <div class="filter-section">
+                <div class="filter-title">事件類型</div>
+                <div class="filter-options">
+                    <div class="filter-chip selected">
+                        <span>📋 待辦事項</span>
+                    </div>
+                    <div class="filter-chip selected">
+                        <span>🗳️ 投票項目</span>
+                    </div>
+                    <div class="filter-chip selected">
+                        <span>📅 已排程事件</span>
+                    </div>
+                </div>
+            </div>
+            <div class="filter-actions">
+                <button class="manage-calendar-button">管理日曆</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Calendar Header -->
+    <div class="calendar-header">
+        <div class="month-nav">
+            <button class="nav-button" onclick="prevMonth()">‹</button>
+            <div class="month-title" id="monthTitle">2025年 7月</div>
+            <button class="nav-button" onclick="nextMonth()">›</button>
+        </div>
+    </div>
+
+    <!-- Calendar -->
+    <div class="calendar-container">
+        <!-- Weekdays -->
+        <div class="calendar-weekdays">
+            <div class="weekday">日</div>
+            <div class="weekday">一</div>
+            <div class="weekday">二</div>
+            <div class="weekday">三</div>
+            <div class="weekday">四</div>
+            <div class="weekday">五</div>
+            <div class="weekday">六</div>
+        </div>
+
+        <!-- Calendar Grid -->
+        <div class="calendar-grid" id="calendarGrid">
+            <!-- Week 1 -->
+            <div class="calendar-day other-month">
+                <div class="day-number">29</div>
+            </div>
+            <div class="calendar-day other-month">
+                <div class="day-number">30</div>
+            </div>
+            <div class="calendar-day today selected">
+                <div class="day-number">1</div>
+                <div class="event personal" onclick="showEventDetails(event, '買牛奶')">買牛奶</div>
+                <div class="event work" onclick="showEventDetails(event, '團隊會議')">團隊會議</div>
+            </div>
+            <div class="calendar-day">
+                <div class="day-number">2</div>
+                <div class="event lover" onclick="showEventDetails(event, '約會看電影')">約會看電影</div>
+            </div>
+            <div class="calendar-day">
+                <div class="day-number">3</div>
+            </div>
+            <div class="calendar-day">
+                <div class="day-number">4</div>
+                <div class="event work" onclick="showEventDetails(event, '專案報告')">專案報告</div>
+                <div class="event personal" onclick="showEventDetails(event, '健身房')">健身房</div>
+            </div>
+            <div class="calendar-day">
+                <div class="day-number">5</div>
+                <div class="event friends" onclick="showEventDetails(event, '聚餐投票')">聚餐投票</div>
+            </div>
+
+            <!-- Week 2 -->
+            <div class="calendar-day">
+                <div class="day-number">6</div>
+            </div>
+            <div class="calendar-day">
+                <div class="day-number">7</div>
+                <div class="event personal" onclick="showEventDetails(event, '繳交報告')">繳交報告</div>
+            </div>
+            <div class="calendar-day">
+                <div class="day-number">8</div>
+                <div class="event work" onclick="showEventDetails(event, '客戶會議')">客戶會議</div>
+            </div>
+            <div class="calendar-day">
+                <div class="day-number">9</div>
+            </div>
+            <div class="calendar-day">
+                <div class="day-number">10</div>
+                <div class="event lover" onclick="showEventDetails(event, '週末旅遊')">週末旅遊</div>
+            </div>
+            <div class="calendar-day">
+                <div class="day-number">11</div>
+                <div class="event lover" onclick="showEventDetails(event, '週末旅遊')">週末旅遊</div>
+            </div>
+            <div class="calendar-day">
+                <div class="day-number">12</div>
+                <div class="event friends" onclick="showEventDetails(event, '朋友聚會')">朋友聚會</div>
+            </div>
+
+            <!-- Week 3 -->
+            <div class="calendar-day">
+                <div class="day-number">13</div>
+            </div>
+            <div class="calendar-day">
+                <div class="day-number">14</div>
+                <div class="event work" onclick="showEventDetails(event, '月會')">月會</div>
+            </div>
+            <div class="calendar-day">
+                <div class="day-number">15</div>
+                <div class="event personal" onclick="showEventDetails(event, '醫院複診')">醫院複診</div>
+            </div>
+            <div class="calendar-day">
+                <div class="day-number">16</div>
+            </div>
+            <div class="calendar-day">
+                <div class="day-number">17</div>
+                <div class="event work" onclick="showEventDetails(event, '專案審查')">專案審查</div>
+            </div>
+            <div class="calendar-day">
+                <div class="day-number">18</div>
+                <div class="event personal" onclick="showEventDetails(event, '購物')">購物</div>
+                <div class="event friends" onclick="showEventDetails(event, '運動')">運動</div>
+            </div>
+            <div class="calendar-day">
+                <div class="day-number">19</div>
+                <div class="event lover" onclick="showEventDetails(event, '晚餐約會')">晚餐約會</div>
+            </div>
+
+            <!-- Week 4 -->
+            <div class="calendar-day">
+                <div class="day-number">20</div>
+            </div>
+            <div class="calendar-day">
+                <div class="day-number">21</div>
+                <div class="event work" onclick="showEventDetails(event, '培訓課程')">培訓課程</div>
+            </div>
+            <div class="calendar-day">
+                <div class="day-number">22</div>
+                <div class="event work" onclick="showEventDetails(event, '培訓課程')">培訓課程</div>
+            </div>
+            <div class="calendar-day">
+                <div class="day-number">23</div>
+            </div>
+            <div class="calendar-day">
+                <div class="day-number">24</div>
+                <div class="event personal" onclick="showEventDetails(event, '整理房間')">整理房間</div>
+            </div>
+            <div class="calendar-day">
+                <div class="day-number">25</div>
+                <div class="event friends" onclick="showEventDetails(event, 'KTV')">KTV</div>
+            </div>
+            <div class="calendar-day">
+                <div class="day-number">26</div>
+                <div class="event lover" onclick="showEventDetails(event, '看展覽')">看展覽</div>
+            </div>
+
+            <!-- Week 5 -->
+            <div class="calendar-day">
+                <div class="day-number">27</div>
+            </div>
+            <div class="calendar-day">
+                <div class="day-number">28</div>
+                <div class="event work" onclick="showEventDetails(event, '月底結算')">月底結算</div>
+            </div>
+            <div class="calendar-day">
+                <div class="day-number">29</div>
+            </div>
+            <div class="calendar-day">
+                <div class="day-number">30</div>
+                <div class="event personal" onclick="showEventDetails(event, '準備旅遊')">準備旅遊</div>
+            </div>
+            <div class="calendar-day">
+                <div class="day-number">31</div>
+                <div class="event personal" onclick="showEventDetails(event, '月末檢討')">月末檢討</div>
+            </div>
+            <div class="calendar-day other-month">
+                <div class="day-number">1</div>
+            </div>
+            <div class="calendar-day other-month">
+                <div class="day-number">2</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- FAB -->
+    <button class="fab" title="新增事件">+</button>
+
+    <!-- Bottom Navigation -->
+    <div class="bottom-nav">
+        <div class="nav-item">
+            <div class="nav-icon">📋</div>
+            <span>Todo</span>
+        </div>
+        <div class="nav-item">
+            <div class="nav-icon">🗳️</div>
+            <span>Vote</span>
+        </div>
+        <div class="nav-item active">
+            <div class="nav-icon">📅</div>
+            <span>Calendar</span>
+        </div>
+        <div class="nav-item">
+            <div class="nav-icon">👤</div>
+            <span>Profile</span>
+        </div>
+    </div>
+
+    <!-- Event Details Modal -->
+    <div class="modal" id="eventModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">7月1日 事件</div>
+                <button class="close-button" onclick="closeModal()">×</button>
+            </div>
+            <div class="event-list" id="eventList">
+                <div class="event-item personal">
+                    <div class="event-title">買牛奶</div>
+                    <div class="event-meta">
+                        <span>📋 待辦事項</span>
+                        <span>•</span>
+                        <span>個人日曆</span>
+                        <span>•</span>
+                        <span>今天 14:30</span>
+                    </div>
+                </div>
+                <div class="event-item work">
+                    <div class="event-title">團隊會議</div>
+                    <div class="event-meta">
+                        <span>📅 已排程事件</span>
+                        <span>•</span>
+                        <span>工作日曆</span>
+                        <span>•</span>
+                        <span>今天 10:00-11:00</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentMonth = new Date(2025, 6, 1); // July 2025
+        let filterExpanded = false;
+
+        // Filter toggle
+        document.getElementById('filterToggle').addEventListener('click', function() {
+            filterExpanded = !filterExpanded;
+            const panel = document.getElementById('filterPanel');
+            const button = document.getElementById('filterToggle');
+            
+            if (filterExpanded) {
+                panel.classList.add('expanded');
+                button.classList.add('active');
+            } else {
+                panel.classList.remove('expanded');
+                button.classList.remove('active');
+            }
+        });
+
+        // Filter chips
+        document.querySelectorAll('.filter-chip').forEach(chip => {
+            chip.addEventListener('click', function() {
+                this.classList.toggle('selected');
+                updateFilterStatus();
+            });
+        });
+
+        // Preset buttons
+        document.querySelectorAll('.preset-button').forEach(button => {
+            button.addEventListener('click', function() {
+                document.querySelectorAll('.preset-button').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                
+                // Apply preset
+                const preset = this.textContent;
+                applyPreset(preset);
+            });
+        });
+
+        function applyPreset(preset) {
+            const chips = document.querySelectorAll('.filter-chip');
+            chips.forEach(chip => chip.classList.remove('selected'));
+            
+            switch(preset) {
+                case '個人模式':
+                    document.querySelector('.filter-chip:nth-child(1)').classList.add('selected');
+                    break;
+                case '生活模式':
+                    document.querySelector('.filter-chip:nth-child(1)').classList.add('selected');
+                    document.querySelector('.filter-chip:nth-child(2)').classList.add('selected');
+                    break;
+                case '社交模式':
+                    document.querySelector('.filter-chip:nth-child(1)').classList.add('selected');
+                    document.querySelector('.filter-chip:nth-child(3)').classList.add('selected');
+                    break;
+                case '工作模式':
+                    document.querySelector('.filter-chip:nth-child(1)').classList.add('selected');
+                    document.querySelector('.filter-chip:nth-child(4)').classList.add('selected');
+                    break;
+            }
+            updateFilterStatus();
+        }
+
+        function updateFilterStatus() {
+            const selectedChips = document.querySelectorAll('.filter-chip.selected').length;
+            const statusElement = document.getElementById('filterStatus');
+            statusElement.textContent = `${selectedChips} 個日曆`;
+        }
+
+        // Month navigation
+        function prevMonth() {
+            currentMonth.setMonth(currentMonth.getMonth() - 1);
+            updateMonthTitle();
+        }
+
+        function nextMonth() {
+            currentMonth.setMonth(currentMonth.getMonth() + 1);
+            updateMonthTitle();
+        }
+
+        function goToToday() {
+            currentMonth = new Date(2025, 6, 1);
+            updateMonthTitle();
+            
+            // Highlight today
+            document.querySelectorAll('.calendar-day').forEach(day => {
+                day.classList.remove('selected');
+            });
+            document.querySelector('.calendar-day.today').classList.add('selected');
+        }
+
+        function updateMonthTitle() {
+            const monthNames = ['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月', '12月'];
+            const monthTitle = document.getElementById('monthTitle');
+            monthTitle.textContent = `${currentMonth.getFullYear()}年 ${monthNames[currentMonth.getMonth()]}`;
+        }
+
+        // Calendar day selection
+        document.querySelectorAll('.calendar-day').forEach(day => {
+            day.addEventListener('click', function(e) {
+                if (e.target.classList.contains('event')) return;
+                
+                document.querySelectorAll('.calendar-day').forEach(d => d.classList.remove('selected'));
+                this.classList.add('selected');
+            });
+        });
+
+        // Event details modal
+        function showEventDetails(event, title) {
+            event.stopPropagation();
+            const modal = document.getElementById('eventModal');
+            modal.classList.add('show');
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('eventModal');
+            modal.classList.remove('show');
+        }
+
+        // Close modal when clicking outside
+        document.getElementById('eventModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeModal();
+            }
+        });
+
+        // View toggle
+        document.querySelectorAll('.view-button').forEach(button => {
+            button.addEventListener('click', function() {
+                document.querySelectorAll('.view-button').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                
+                console.log(`切換到 ${this.textContent} 視圖`);
+            });
+        });
+
+        // FAB click
+        document.querySelector('.fab').addEventListener('click', function() {
+            alert('新增事件到選中的日期');
+        });
+
+        // Manage calendar button
+        document.querySelector('.manage-calendar-button').addEventListener('click', function() {
+            alert('進入日曆管理頁面 - 統一管理所有日曆');
+        });
+
+        // Long press on filter chips (simulate for desktop with right-click)
+        document.querySelectorAll('.filter-chip').forEach(chip => {
+            chip.addEventListener('contextmenu', function(e) {
+                e.preventDefault();
+                if (this.classList.contains('selected')) {
+                    const calendarName = this.querySelector('span').textContent;
+                    alert(`管理 ${calendarName} 日曆\n- 日曆設定\n- 成員管理\n- 權限設定`);
+                }
+            });
+        });
+
+        // Initialize
+        updateFilterStatus();
+    </script>
+</body>
+</html>
