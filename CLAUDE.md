@@ -80,6 +80,22 @@ backend/app/
 4. Write tests following existing test patterns
 5. API endpoints should follow RESTful conventions in `api/v1/`
 
+### Before Making Major Changes
+**ALWAYS ask the user first** when planning:
+- **Architectural changes**: Modifying database schemas, API structure, or core patterns
+- **New features**: Adding new entities, endpoints, or significant functionality
+- **Breaking changes**: Changes that affect existing API contracts or database structure
+- **File restructuring**: Moving or renaming core files and directories
+- **Dependency changes**: Adding new major libraries or changing package versions
+
+### Documentation Requirements
+For any significant changes, **MUST update documentation FIRST**:
+1. **Create/update implementation docs** in `/docs/implementation/` for new APIs
+2. **Update API documentation** in `/docs/api/rest-api.md` for new endpoints
+3. **Create ADR** in `/docs/adr/` for architectural decisions
+4. **Update README.md** status section for completed features
+5. **Update this CLAUDE.md** for process or guideline changes
+
 ### Testing Approach
 - Tests use SQLite in-memory database (not PostgreSQL)
 - Each test gets isolated database via fixtures
@@ -110,7 +126,7 @@ async def create_item(
 - ✅ User registration and authentication (JWT)
 - ✅ Calendar management with permissions
 - ✅ List CRUD operations
-- 🚧 ListItem, Vote, and Event APIs in development
+- ✅ ListItem, Vote, and Event APIs - Complete REST API system
 - 📋 Frontend not yet implemented
 
 ## Important Notes
@@ -119,3 +135,24 @@ async def create_item(
 3. Use environment variables from `.env` (copy from `.env.example`)
 4. Docker Compose provides PostgreSQL database for development
 5. Package management uses `uv` (not pip or poetry)
+
+## Project Maintenance Guidelines
+
+### When Cleaning/Organizing Project
+When asked to clean up or organize the project, **ONLY** remove these types of files:
+- **AI assistant files**: `GEMINI.md`, `IMPLEMENTATION_LOG.md`, etc.
+- **Migration backups**: Only when explicitly mentioned (e.g., `alembic/versions/backup/`)
+
+### DO NOT automatically clean:
+- `.DS_Store` files (macOS system files - not worth the time)
+- `__pycache__/` directories (Python runtime cache - regenerated automatically)
+- `*.pyc` files (Python compiled bytecode - not harmful)
+- `.pytest_cache/` (pytest cache - improves test performance)
+- Any files in `.venv/` (virtual environment dependencies)
+- Test databases like `test.db` (unless specifically asked)
+
+### Focus cleanup efforts on:
+- Outdated documentation files
+- Duplicate or conflicting files
+- Large unnecessary files that impact repository size
+- Files that could cause confusion for developers

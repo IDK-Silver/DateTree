@@ -188,6 +188,187 @@ DELETE /api/v1/lists/{list_id}
 
 **回應**：`204 No Content`
 
+### List Items (清單項目管理)
+
+#### 取得清單的所有項目
+
+```http
+GET /api/v1/list-items/list/{list_id}
+```
+
+**回應範例**：
+
+```json
+[
+  {
+    "id": 1,
+    "content": "買牛奶",
+    "is_completed": false,
+    "list_id": 1,
+    "creator_id": 1,
+    "created_at": "2025-07-01T10:00:00Z"
+  }
+]
+```
+
+#### 取得帶投票數的清單項目
+
+```http
+GET /api/v1/list-items/list/{list_id}/with-votes
+```
+
+**回應範例**：
+
+```json
+[
+  {
+    "id": 1,
+    "content": "陽明山登山",
+    "is_completed": false,
+    "list_id": 1,
+    "creator_id": 1,
+    "created_at": "2025-07-01T10:00:00Z",
+    "vote_count": 3
+  }
+]
+```
+
+#### 建立清單項目
+
+```http
+POST /api/v1/list-items/
+```
+
+**請求主體**：
+
+```json
+{
+  "content": "完成專案文檔",
+  "list_id": 1
+}
+```
+
+#### 更新清單項目
+
+```http
+PUT /api/v1/list-items/{item_id}
+```
+
+**請求主體**：
+
+```json
+{
+  "content": "更新的項目內容",
+  "is_completed": true
+}
+```
+
+#### 刪除清單項目
+
+```http
+DELETE /api/v1/list-items/{item_id}
+```
+
+### Votes (投票管理)
+
+#### 對項目投票
+
+```http
+POST /api/v1/votes/
+```
+
+**請求主體**：
+
+```json
+{
+  "list_item_id": 1
+}
+```
+
+#### 取得項目的所有投票
+
+```http
+GET /api/v1/votes/item/{item_id}
+```
+
+#### 取得我的投票記錄
+
+```http
+GET /api/v1/votes/user/my-votes
+```
+
+#### 取消投票
+
+```http
+DELETE /api/v1/votes/item/{item_id}
+```
+
+### Events (事件管理)
+
+#### 取得日曆的所有事件
+
+```http
+GET /api/v1/events/calendar/{calendar_id}
+```
+
+**回應範例**：
+
+```json
+[
+  {
+    "id": 1,
+    "title": "團隊會議",
+    "description": "週例會",
+    "start_time": "2025-07-01T10:00:00Z",
+    "end_time": "2025-07-01T11:00:00Z",
+    "calendar_id": 1,
+    "creator_id": 1
+  }
+]
+```
+
+#### 取得即將到來的事件
+
+```http
+GET /api/v1/events/calendar/{calendar_id}/upcoming
+```
+
+#### 按日期範圍查詢事件
+
+```http
+GET /api/v1/events/calendar/{calendar_id}/date-range?start_date=2025-07-01T00:00:00Z&end_date=2025-07-07T23:59:59Z
+```
+
+#### 建立事件
+
+```http
+POST /api/v1/events/
+```
+
+**請求主體**：
+
+```json
+{
+  "title": "牙醫預約",
+  "description": "定期檢查",
+  "start_time": "2025-07-02T14:00:00Z",
+  "end_time": "2025-07-02T15:00:00Z",
+  "calendar_id": 1
+}
+```
+
+#### 更新事件
+
+```http
+PUT /api/v1/events/{event_id}
+```
+
+#### 刪除事件
+
+```http
+DELETE /api/v1/events/{event_id}
+```
+
 ### 清單類型
 
 目前支援的清單類型：

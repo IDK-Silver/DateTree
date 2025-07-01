@@ -1,8 +1,9 @@
 # ADR 002: 採用可擴展的多清單協作模型
 
-- **狀態**: 已實施 (Implemented)
+- **狀態**: 完全實施 (Fully Implemented)
 - **日期**: 2025-06-29
 - **實施日期**: 2025-06-29
+- **API 實施完成日期**: 2025-07-01
 
 ---
 
@@ -92,3 +93,26 @@ User → Event (一對多，作為建立者)
 - 生產環境部署後，所有架構變更都應使用漸進式遷移
 - 建立資料備份和恢復程序
 - 考慮建立專用的資料遷移工具
+
+### 6. API 實施完成 (API Implementation Completed)
+
+**實施日期**: 2025-07-01
+
+**完成的 API 系統**：
+- **ListItem API** (`/api/v1/list-items/`) - 完整的 CRUD 操作，支援投票數查詢
+- **Vote API** (`/api/v1/votes/`) - 投票系統，防重複投票，支援民主決策
+- **Event API** (`/api/v1/events/`) - 事件管理，支援日期範圍和即將到來的事件查詢
+
+**核心功能實現**：
+- ✅ 多清單類型支援 (TODO, PRIORITY)
+- ✅ 協作投票機制
+- ✅ 使用者權限控制
+- ✅ 完整的資料驗證和錯誤處理
+- ✅ RESTful API 設計原則
+
+**實施文檔**：
+- [ListItem API 實施詳情](../implementation/list-item-api.md)
+- [Vote API 實施詳情](../implementation/vote-api.md)
+- [Event API 實施詳情](../implementation/event-api.md)
+
+此架構決策的完整實施為 DateTree 的核心協作功能奠定了堅實基礎。
