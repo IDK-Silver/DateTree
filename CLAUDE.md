@@ -42,7 +42,7 @@ uv run ruff format .                             # Format code
 
 ### Flutter Development
 ```bash
-cd datetree_flutter
+cd mobile
 flutter pub get                                  # Install dependencies
 flutter run -d chrome                           # Run on web
 flutter run                                      # Run on default device
@@ -66,12 +66,12 @@ backend/app/
 
 #### Flutter Frontend
 ```
-datetree_flutter/lib/
+mobile/lib/
 ├── core/
 │   ├── constants/   # App constants and configuration
 │   ├── theme/       # Material 3 theme definitions
 │   ├── providers/   # Global Riverpod providers
-│   └── services/    # Core services (planned)
+│   └── services/    # Core services
 ├── features/
 │   ├── auth/        # Authentication screens and logic
 │   ├── todo/        # Todo management features
@@ -84,7 +84,7 @@ datetree_flutter/lib/
     │   ├── molecules/ # Composite components
     │   ├── organisms/ # Complex components
     │   └── templates/ # Page layouts
-    └── models/      # Data models (planned)
+    └── models/      # Data models
 ```
 
 ### Key Architectural Patterns

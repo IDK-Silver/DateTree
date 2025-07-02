@@ -1,6 +1,6 @@
-# datetree_flutter
+# DateTree Mobile
 
-A new Flutter project.
+DateTree mobile application built with Flutter for cross-platform task and event management.
 
 ## Getting Started
 

@@ -183,7 +183,7 @@ Flutter 應用程式開發已啟動，基礎架構已完成：
 
 ```bash
 # 切換到 Flutter 專案目錄
-cd datetree_flutter
+cd mobile
 
 # 安裝依賴
 flutter pub get
@@ -195,7 +195,7 @@ flutter run            # 在預設裝置執行
 
 詳細的 Flutter 開發環境設定請參閱：
 * [Flutter ADR 文檔](docs/adr/) - ADR-006 和 ADR-007
-* [Flutter 專案結構](datetree_flutter/) - 基於原子設計模式的專案架構
+* [Flutter 專案結構](mobile/) - 基於原子設計模式的專案架構
 
 ### API 文檔
 

@@ -149,7 +149,7 @@ lib/
 ### Getting Started
 ```bash
 # Navigate to Flutter project
-cd datetree_flutter
+cd mobile
 
 # Install dependencies
 flutter pub get
