@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-DateTree is a collaborative task and event management API built with FastAPI and PostgreSQL. The project uses modern Python practices with type hints and comprehensive testing. Note: Currently using synchronous database operations (not async).
+DateTree is a collaborative task and event management system with a FastAPI backend and Flutter frontend. The backend uses PostgreSQL with async operations, while the Flutter app provides cross-platform mobile access. The project follows modern development practices with comprehensive testing and documentation.
 
 ## Essential Commands
 
@@ -40,9 +40,21 @@ uv run ruff check .                              # Check code style
 uv run ruff format .                             # Format code
 ```
 
+### Flutter Development
+```bash
+cd datetree_flutter
+flutter pub get                                  # Install dependencies
+flutter run -d chrome                           # Run on web
+flutter run                                      # Run on default device
+flutter test                                     # Run unit tests
+flutter packages pub run build_runner build     # Generate code
+```
+
 ## Architecture Overview
 
 ### Directory Structure
+
+#### Backend
 ```
 backend/app/
 ├── api/v1/          # API endpoints (users, lists, calendars)
@@ -52,12 +64,42 @@ backend/app/
 └── schemas/         # Pydantic validation schemas
 ```
 
+#### Flutter Frontend
+```
+datetree_flutter/lib/
+├── core/
+│   ├── constants/   # App constants and configuration
+│   ├── theme/       # Material 3 theme definitions
+│   ├── providers/   # Global Riverpod providers
+│   └── services/    # Core services (planned)
+├── features/
+│   ├── auth/        # Authentication screens and logic
+│   ├── todo/        # Todo management features
+│   ├── vote/        # Voting and collaboration features
+│   ├── calendar/    # Calendar views and events
+│   └── profile/     # User profile and settings
+└── shared/
+    ├── widgets/     # Atomic design components
+    │   ├── atoms/   # Basic UI elements
+    │   ├── molecules/ # Composite components
+    │   ├── organisms/ # Complex components
+    │   └── templates/ # Page layouts
+    └── models/      # Data models (planned)
+```
+
 ### Key Architectural Patterns
 
+#### Backend
 1. **Layered Architecture**: API → CRUD → Models with Schemas for validation
 2. **Async Database Operations**: All database queries use async SQLAlchemy
 3. **Dependency Injection**: FastAPI dependencies for database sessions and authentication
 4. **Multi-tenant Calendars**: Users can own/share multiple calendars with different permissions
+
+#### Frontend
+1. **Atomic Design**: Modular component hierarchy (atoms → molecules → organisms → templates)
+2. **State Management**: Riverpod for reactive state management
+3. **Mobile-first Design**: Cross-platform with platform-specific optimizations
+4. **Offline-first**: Local storage with server synchronization
 
 ### Database Relationships
 - User ↔ Calendar (many-to-many via UserCalendar with permissions)
@@ -148,20 +190,42 @@ async def create_item(
 ```
 
 ## Current Implementation Status
+
+### Backend (Complete ✅)
 - ✅ User registration and authentication (JWT)
 - ✅ Calendar management with permissions
 - ✅ List CRUD operations
 - ✅ ListItem, Vote, and Event APIs - Complete REST API system
-- ✅ Comprehensive test suite (104+ tests) with full coverage
+- ✅ Comprehensive test suite (140+ tests) with full coverage
 - ✅ Complete API documentation with relationship explanations and usage examples
-- 📋 Frontend not yet implemented
+
+### Flutter Frontend (In Development 🚧)
+- ✅ Project architecture with atomic design pattern
+- ✅ Core navigation with 4 main screens (Todo, Vote, Calendar, Profile)
+- ✅ Authentication screens (Login, Register)
+- ✅ UI component library (atoms, molecules, templates)
+- ✅ State management with Riverpod
+- ✅ Material 3 theme system with dark mode support
+- 🚧 API integration and data synchronization
+- 📋 Core functionality implementation (todo, calendar, voting)
 
 ## Important Notes
+
+### Backend Development
 1. Always run tests before committing changes
 2. Database migrations must be tested with upgrade/downgrade cycle
 3. Use environment variables from `.env` (copy from `.env.example`)
 4. Docker Compose provides PostgreSQL database for development
 5. Package management uses `uv` (not pip or poetry)
+
+### Flutter Development
+1. Follow atomic design pattern for UI components
+2. Use Riverpod for state management, avoid direct state mutations
+3. Implement offline-first approach with local caching
+4. Test on both iOS and Android simulators/devices
+5. Use code generation for serialization and API clients
+6. Follow Material 3 design guidelines
+7. Maintain performance targets: <3s cold start, <200ms interactions
 
 ## Project Maintenance Guidelines
 

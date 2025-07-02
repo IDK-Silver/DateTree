@@ -1,10 +1,10 @@
 # DateTree 產品需求規格書
 
-**文件版本**: 1.4
+**文件版本**: 1.5
 
-**最後更新日期**: 2025-07-01
+**最後更新日期**: 2025-07-02
 
-**狀態**: 後端完成，前端開發中 (Backend Complete, Frontend In Development)
+**狀態**: 後端完成，Flutter 前端開發中 (Backend Complete, Flutter Frontend In Development)
 
 ## 1. 專案願景 (Project Vision)
 
@@ -138,15 +138,25 @@
 
 ### 開發中的功能 🚧
 
-* **前端應用開發**: React/Vue.js 前端介面開發
+* **Flutter 前端應用開發**: 跨平台移動應用程式開發
+  * ✅ **專案架構**: 基於 ADR 設定的原子設計模式
+  * ✅ **核心頁面**: Todo、Vote、Calendar、Profile 四個主要頁面
+  * ✅ **底部導航**: Material 3 設計語言的導航架構
+  * ✅ **認證介面**: 登入、註冊表單界面
+  * ✅ **元件庫**: 原子級和分子級 UI 元件
+  * ✅ **狀態管理**: Riverpod 配置完成
+  * ✅ **主題系統**: 支援淺色/深色模式
+  * 🚧 **API 整合**: 連接後端 FastAPI 服務
+  * 🚧 **資料同步**: 實現離線優先的資料管理
 
 ### 計劃中的功能 📋
 
-* **前端功能實作**:
-  * 待辦清單頁面 (Todo View)
-  * 日曆頁面 (Calendar View)
-  * 快速新增介面
+* **前端功能完善**:
+  * 待辦清單功能實作
+  * 日曆視圖功能實作
+  * 快速新增功能
   * 詳細編輯頁面
+  * 協作投票功能
 * **進階功能**:
   * 即時協作 (WebSocket 實時更新)
   * 通知系統 (事件提醒和通知)
@@ -167,9 +177,25 @@
 * [開發環境設定指南](docs/guides/development-setup.md) - 完整的開發環境設定
 * [測試指南](docs/development/testing-guide.md) - 測試架構和最佳實踐
 
-### 前端 (Frontend)
+### 前端 (Frontend - Flutter App)
 
-(計劃中，尚未實施)
+Flutter 應用程式開發已啟動，基礎架構已完成：
+
+```bash
+# 切換到 Flutter 專案目錄
+cd datetree_flutter
+
+# 安裝依賴
+flutter pub get
+
+# 執行應用程式
+flutter run -d chrome  # 在瀏覽器執行
+flutter run            # 在預設裝置執行
+```
+
+詳細的 Flutter 開發環境設定請參閱：
+* [Flutter ADR 文檔](docs/adr/) - ADR-006 和 ADR-007
+* [Flutter 專案結構](datetree_flutter/) - 基於原子設計模式的專案架構
 
 ### API 文檔
 
