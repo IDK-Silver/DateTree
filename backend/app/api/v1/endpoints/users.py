@@ -57,3 +57,12 @@ def create_user(
         )
     user = crud.user.create(db, obj_in=user_in)
     return user
+
+@router.get("/me", response_model=schemas.User)
+def get_current_user(
+    current_user: models.User = Depends(deps.get_current_user)
+) -> Any:
+    """
+    Get current user information.
+    """
+    return current_user
