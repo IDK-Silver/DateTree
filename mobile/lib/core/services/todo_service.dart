@@ -55,7 +55,7 @@ class TodoService {
 
   Future<TodoList> createList(int calendarId, TodoListCreate list) async {
     try {
-      return await _apiClient.createList(calendarId, list);
+      return await _apiClient.createList(list);
     } on DioException catch (e) {
       throw _handleError(e);
     }
@@ -88,7 +88,7 @@ class TodoService {
 
   Future<ListItem> createListItem(int listId, ListItemCreate item) async {
     try {
-      return await _apiClient.createListItem(listId, item);
+      return await _apiClient.createListItem(item);
     } on DioException catch (e) {
       throw _handleError(e);
     }

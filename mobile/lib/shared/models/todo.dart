@@ -4,12 +4,10 @@ import 'package:equatable/equatable.dart';
 part 'todo.g.dart';
 
 enum ListType {
-  @JsonValue('todo')
+  @JsonValue('TODO')
   todo,
-  @JsonValue('priority')
+  @JsonValue('PRIORITY')
   priority,
-  @JsonValue('checklist')
-  checklist,
 }
 
 @JsonSerializable()
@@ -17,6 +15,7 @@ class TodoList extends Equatable {
   final int id;
   final String name;
   final String? description;
+  @JsonKey(name: 'list_type')
   final ListType type;
   @JsonKey(name: 'calendar_id')
   final int calendarId;
@@ -43,6 +42,7 @@ class TodoList extends Equatable {
 class TodoListCreate extends Equatable {
   final String name;
   final String? description;
+  @JsonKey(name: 'list_type')
   final ListType type;
   @JsonKey(name: 'calendar_id')
   final int calendarId;
@@ -64,28 +64,26 @@ class TodoListCreate extends Equatable {
 @JsonSerializable()
 class ListItem extends Equatable {
   final int id;
-  final String title;
-  final String? description;
-  @JsonKey(name: 'due_date')
-  final DateTime? dueDate;
+  final String content;
   @JsonKey(name: 'is_completed')
   final bool isCompleted;
   @JsonKey(name: 'list_id')
   final int listId;
+  @JsonKey(name: 'creator_id')
+  final int? creatorId;
   @JsonKey(name: 'created_at')
   final DateTime createdAt;
-  @JsonKey(name: 'completed_at')
-  final DateTime? completedAt;
+  @JsonKey(name: 'vote_count')
+  final int? voteCount;
 
   const ListItem({
     required this.id,
-    required this.title,
-    this.description,
-    this.dueDate,
+    required this.content,
     required this.isCompleted,
     required this.listId,
+    this.creatorId,
     required this.createdAt,
-    this.completedAt,
+    this.voteCount,
   });
 
   factory ListItem.fromJson(Map<String, dynamic> json) => _$ListItemFromJson(json);
@@ -93,43 +91,36 @@ class ListItem extends Equatable {
 
   ListItem copyWith({
     int? id,
-    String? title,
-    String? description,
-    DateTime? dueDate,
+    String? content,
     bool? isCompleted,
     int? listId,
+    int? creatorId,
     DateTime? createdAt,
-    DateTime? completedAt,
+    int? voteCount,
   }) {
     return ListItem(
       id: id ?? this.id,
-      title: title ?? this.title,
-      description: description ?? this.description,
-      dueDate: dueDate ?? this.dueDate,
+      content: content ?? this.content,
       isCompleted: isCompleted ?? this.isCompleted,
       listId: listId ?? this.listId,
+      creatorId: creatorId ?? this.creatorId,
       createdAt: createdAt ?? this.createdAt,
-      completedAt: completedAt ?? this.completedAt,
+      voteCount: voteCount ?? this.voteCount,
     );
   }
 
   @override
-  List<Object?> get props => [id, title, description, dueDate, isCompleted, listId, createdAt, completedAt];
+  List<Object?> get props => [id, content, isCompleted, listId, creatorId, createdAt, voteCount];
 }
 
 @JsonSerializable()
 class ListItemCreate extends Equatable {
-  final String title;
-  final String? description;
-  @JsonKey(name: 'due_date')
-  final DateTime? dueDate;
+  final String content;
   @JsonKey(name: 'list_id')
   final int listId;
 
   const ListItemCreate({
-    required this.title,
-    this.description,
-    this.dueDate,
+    required this.content,
     required this.listId,
   });
 
@@ -137,22 +128,17 @@ class ListItemCreate extends Equatable {
   Map<String, dynamic> toJson() => _$ListItemCreateToJson(this);
 
   @override
-  List<Object?> get props => [title, description, dueDate, listId];
+  List<Object?> get props => [content, listId];
 }
 
 @JsonSerializable()
 class ListItemUpdate extends Equatable {
-  final String? title;
-  final String? description;
-  @JsonKey(name: 'due_date')
-  final DateTime? dueDate;
+  final String? content;
   @JsonKey(name: 'is_completed')
   final bool? isCompleted;
 
   const ListItemUpdate({
-    this.title,
-    this.description,
-    this.dueDate,
+    this.content,
     this.isCompleted,
   });
 
@@ -160,5 +146,5 @@ class ListItemUpdate extends Equatable {
   Map<String, dynamic> toJson() => _$ListItemUpdateToJson(this);
 
   @override
-  List<Object?> get props => [title, description, dueDate, isCompleted];
+  List<Object?> get props => [content, isCompleted];
 }

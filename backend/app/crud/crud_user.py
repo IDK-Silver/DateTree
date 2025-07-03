@@ -44,7 +44,7 @@ class CRUDUser(CRUDBase[User, UserCreate, UserUpdate]):
         db.refresh(db_obj)
 
         # Create the default personal calendar for the new user
-        personal_calendar_in = CalendarCreate(name=f"{db_obj.username}'s Personal Calendar")
+        personal_calendar_in = CalendarCreate(name="Personal")
         calendar_crud.create_with_owner(
             db=db, 
             obj_in=personal_calendar_in, 

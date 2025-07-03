@@ -186,9 +186,7 @@ class TodoNotifier extends StateNotifier<TodoState> {
   }
 
   Future<void> createTodo({
-    required String title,
-    String? description,
-    DateTime? dueDate,
+    required String content,
   }) async {
     try {
       // Get or create default todo list for this calendar
@@ -196,9 +194,7 @@ class TodoNotifier extends StateNotifier<TodoState> {
       final todoList = await _todoService.getOrCreateDefaultTodoList(calendarId, calendar.name);
       
       final itemCreate = ListItemCreate(
-        title: title,
-        description: description,
-        dueDate: dueDate,
+        content: content,
         listId: todoList.id,
       );
       
@@ -214,16 +210,12 @@ class TodoNotifier extends StateNotifier<TodoState> {
   }
 
   Future<void> updateTodo(int id, {
-    String? title,
-    String? description,
-    DateTime? dueDate,
+    String? content,
     bool? isCompleted,
   }) async {
     try {
       final update = ListItemUpdate(
-        title: title,
-        description: description,
-        dueDate: dueDate,
+        content: content,
         isCompleted: isCompleted,
       );
       

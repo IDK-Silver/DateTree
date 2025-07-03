@@ -51,14 +51,11 @@ abstract class ApiClient {
   Future<void> deleteCalendar(@Path('id') int id);
 
   // List endpoints
-  @GET('/calendars/{calendarId}/lists')
+  @GET('/lists/calendar/{calendarId}')
   Future<List<TodoList>> getLists(@Path('calendarId') int calendarId);
 
-  @POST('/calendars/{calendarId}/lists')
-  Future<TodoList> createList(
-    @Path('calendarId') int calendarId,
-    @Body() TodoListCreate list,
-  );
+  @POST('/lists/')
+  Future<TodoList> createList(@Body() TodoListCreate list);
 
   @GET('/lists/{id}')
   Future<TodoList> getList(@Path('id') int id);
@@ -73,25 +70,22 @@ abstract class ApiClient {
   Future<void> deleteList(@Path('id') int id);
 
   // List item endpoints
-  @GET('/lists/{listId}/items')
+  @GET('/list-items/list/{listId}')
   Future<List<ListItem>> getListItems(@Path('listId') int listId);
 
-  @POST('/lists/{listId}/items')
-  Future<ListItem> createListItem(
-    @Path('listId') int listId,
-    @Body() ListItemCreate item,
-  );
+  @POST('/list-items/')
+  Future<ListItem> createListItem(@Body() ListItemCreate item);
 
-  @GET('/items/{id}')
+  @GET('/list-items/{id}')
   Future<ListItem> getListItem(@Path('id') int id);
 
-  @PUT('/items/{id}')
+  @PUT('/list-items/{id}')
   Future<ListItem> updateListItem(
     @Path('id') int id,
     @Body() ListItemUpdate item,
   );
 
-  @DELETE('/items/{id}')
+  @DELETE('/list-items/{id}')
   Future<void> deleteListItem(@Path('id') int id);
 
   // Vote endpoints

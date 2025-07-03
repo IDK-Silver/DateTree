@@ -17,34 +17,49 @@ class TodoScreen extends ConsumerStatefulWidget {
 
 class _TodoScreenState extends ConsumerState<TodoScreen>
     with SingleTickerProviderStateMixin {
-  late TabController _tabController;
-  final List<String> _calendarNames = ['Personal', 'Lover', 'Friends', 'Work'];
+  TabController? _tabController;
+  List<Calendar> _calendars = [];
 
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: _calendarNames.length, vsync: this);
+    // Tab controller will be initialized when calendars are loaded
   }
 
   @override
   void dispose() {
-    _tabController.dispose();
+    _tabController?.dispose();
     super.dispose();
+  }
+
+  void _updateTabController(List<Calendar> calendars) {
+    if (_calendars.length != calendars.length) {
+      _tabController?.dispose();
+      _tabController = TabController(length: calendars.length, vsync: this);
+      _calendars = calendars;
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     final calendarState = ref.watch(calendarProvider);
     final calendars = calendarState.calendars;
+    
+    // Update tab controller when calendars change
+    if (calendars.isNotEmpty) {
+      _updateTabController(calendars);
+    }
 
     return Scaffold(
       appBar: AppBar(
         title: const Text('Todo'),
-        bottom: TabBar(
-          controller: _tabController,
-          isScrollable: true,
-          tabs: _calendarNames.map((name) => Tab(text: name)).toList(),
-        ),
+        bottom: calendars.isEmpty || _tabController == null
+            ? null
+            : TabBar(
+                controller: _tabController!,
+                isScrollable: true,
+                tabs: calendars.map((calendar) => Tab(text: calendar.name)).toList(),
+              ),
         actions: [
           IconButton(
             icon: const Icon(Icons.add),
@@ -54,13 +69,16 @@ class _TodoScreenState extends ConsumerState<TodoScreen>
       ),
       body: calendarState.isLoading
           ? const Center(child: CircularProgressIndicator())
-          : TabBarView(
-              controller: _tabController,
-              children: _calendarNames.map((name) {
-                final calendar = calendars.where((c) => c.name.toLowerCase() == name.toLowerCase()).firstOrNull;
-                return _buildTodoList(calendar, name);
-              }).toList(),
-            ),
+          : calendars.isEmpty
+              ? _buildEmptyState()
+              : _tabController == null
+                  ? const Center(child: CircularProgressIndicator())
+                  : TabBarView(
+                      controller: _tabController!,
+                      children: calendars.map((calendar) {
+                        return _buildTodoList(calendar);
+                      }).toList(),
+                    ),
       floatingActionButton: FloatingActionButton(
         onPressed: () => _showAddTodoDialog(context),
         child: const Icon(Icons.add),
@@ -68,10 +86,7 @@ class _TodoScreenState extends ConsumerState<TodoScreen>
     );
   }
 
-  Widget _buildTodoList(Calendar? calendar, String categoryName) {
-    if (calendar == null) {
-      return _buildEmptyCalendar(categoryName);
-    }
+  Widget _buildTodoList(Calendar calendar) {
 
     final todoState = ref.watch(todoProvider(calendar.id));
     
@@ -85,8 +100,8 @@ class _TodoScreenState extends ConsumerState<TodoScreen>
             child: Padding(
               padding: const EdgeInsets.all(16.0),
               child: CalendarInfoCard(
-                calendarName: categoryName,
-                calendarColor: _getCalendarColor(categoryName),
+                calendarName: calendar.name,
+                calendarColor: _getCalendarColor(calendar),
                 pendingTasks: todoState.pendingItems.length,
                 completedTasks: todoState.completedItems.length,
                 onTap: () {
@@ -132,10 +147,9 @@ class _TodoScreenState extends ConsumerState<TodoScreen>
                   final item = todoState.pendingItems[index];
                   return TodoItemCard(
                     id: item.id.toString(),
-                    title: item.title,
-                    description: item.description,
-                    dueDate: item.dueDate,
+                    content: item.content,
                     isCompleted: item.isCompleted,
+                    voteCount: item.voteCount,
                     onTap: () => _editTodo(item),
                     onComplete: () => _completeTodo(calendar.id, item.id),
                     onDelete: () => _deleteTodo(calendar.id, item.id),
@@ -172,10 +186,9 @@ class _TodoScreenState extends ConsumerState<TodoScreen>
                   final item = todoState.completedItems[index];
                   return TodoItemCard(
                     id: item.id.toString(),
-                    title: item.title,
-                    description: item.description,
-                    dueDate: item.dueDate,
+                    content: item.content,
                     isCompleted: item.isCompleted,
+                    voteCount: item.voteCount,
                     onTap: () => _editTodo(item),
                     onDelete: () => _deleteTodo(calendar.id, item.id),
                   );
@@ -188,76 +201,64 @@ class _TodoScreenState extends ConsumerState<TodoScreen>
     );
   }
 
-  Widget _buildEmptyCalendar(String categoryName) {
-    return CustomScrollView(
-      slivers: [
-        SliverToBoxAdapter(
-          child: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: CalendarInfoCard(
-              calendarName: categoryName,
-              calendarColor: _getCalendarColor(categoryName),
-              pendingTasks: 0,
-              completedTasks: 0,
-              onTap: () => _createCalendar(categoryName),
+  Widget _buildEmptyState() {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(32.0),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.calendar_today_outlined,
+              size: 64,
+              color: Colors.grey[400],
             ),
-          ),
-        ),
-        SliverToBoxAdapter(
-          child: Center(
-            child: Padding(
-              padding: const EdgeInsets.all(32.0),
-              child: Column(
-                children: [
-                  Icon(
-                    Icons.calendar_today_outlined,
-                    size: 64,
-                    color: Colors.grey[400],
-                  ),
-                  const SizedBox(height: 16),
-                  Text(
-                    'No $categoryName calendar found',
-                    style: Theme.of(context).textTheme.titleMedium,
-                  ),
-                  const SizedBox(height: 8),
-                  ElevatedButton(
-                    onPressed: () => _createCalendar(categoryName),
-                    child: Text('Create $categoryName Calendar'),
-                  ),
-                ],
-              ),
+            const SizedBox(height: 16),
+            Text(
+              'No calendars found',
+              style: Theme.of(context).textTheme.titleLarge,
             ),
-          ),
+            const SizedBox(height: 8),
+            Text(
+              'Create a calendar to start organizing your tasks',
+              style: Theme.of(context).textTheme.bodyMedium,
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 24),
+            ElevatedButton.icon(
+              onPressed: () => _showCreateCalendarDialog(),
+              icon: const Icon(Icons.add),
+              label: const Text('Create Calendar'),
+            ),
+          ],
         ),
-      ],
+      ),
     );
   }
 
-  Color _getCalendarColor(String categoryName) {
-    switch (categoryName.toLowerCase()) {
-      case 'personal':
-        return Colors.blue;
-      case 'lover':
-        return Colors.pink;
-      case 'friends':
-        return Colors.green;
-      case 'work':
-        return Colors.orange;
-      default:
-        return Colors.grey;
-    }
+  Color _getCalendarColor(Calendar calendar) {
+    // Use a color based on calendar ID for consistency
+    final colors = [
+      Colors.blue,
+      Colors.green,
+      Colors.orange,
+      Colors.purple,
+      Colors.teal,
+      Colors.pink,
+      Colors.indigo,
+      Colors.amber,
+    ];
+    return colors[calendar.id % colors.length];
   }
 
   void _showAddTodoDialog(BuildContext context) {
-    final currentIndex = _tabController.index;
-    final categoryName = _calendarNames[currentIndex];
-    final calendars = ref.read(calendarProvider).calendars;
-    final calendar = calendars.where((c) => c.name.toLowerCase() == categoryName.toLowerCase()).firstOrNull;
-
-    if (calendar == null) {
-      _createCalendar(categoryName);
+    if (_tabController == null || _calendars.isEmpty) {
+      _showCreateCalendarDialog();
       return;
     }
+    
+    final currentIndex = _tabController!.index;
+    final calendar = _calendars[currentIndex];
 
     showDialog(
       context: context,
@@ -270,8 +271,63 @@ class _TodoScreenState extends ConsumerState<TodoScreen>
     );
   }
 
-  void _createCalendar(String name) async {
-    await ref.read(calendarProvider.notifier).createCalendar(name);
+  void _showCreateCalendarDialog() {
+    showDialog(
+      context: context,
+      builder: (context) {
+        final nameController = TextEditingController();
+        final descriptionController = TextEditingController();
+        
+        return AlertDialog(
+          title: const Text('Create New Calendar'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: nameController,
+                decoration: const InputDecoration(
+                  labelText: 'Calendar Name',
+                  hintText: 'e.g., Work, Personal, Projects',
+                ),
+                autofocus: true,
+              ),
+              const SizedBox(height: 16),
+              TextField(
+                controller: descriptionController,
+                decoration: const InputDecoration(
+                  labelText: 'Description (optional)',
+                  hintText: 'Brief description of this calendar',
+                ),
+                maxLines: 2,
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text('Cancel'),
+            ),
+            ElevatedButton(
+              onPressed: () async {
+                final name = nameController.text.trim();
+                if (name.isNotEmpty) {
+                  await ref.read(calendarProvider.notifier).createCalendar(
+                    name,
+                    description: descriptionController.text.trim().isEmpty 
+                        ? null 
+                        : descriptionController.text.trim(),
+                  );
+                  if (context.mounted) {
+                    Navigator.of(context).pop();
+                  }
+                }
+              },
+              child: const Text('Create'),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   void _completeTodo(int calendarId, int todoId) async {

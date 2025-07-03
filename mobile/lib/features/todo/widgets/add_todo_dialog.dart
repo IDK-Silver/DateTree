@@ -21,15 +21,12 @@ class AddTodoDialog extends ConsumerStatefulWidget {
 
 class _AddTodoDialogState extends ConsumerState<AddTodoDialog> {
   final _formKey = GlobalKey<FormState>();
-  final _titleController = TextEditingController();
-  final _descriptionController = TextEditingController();
-  DateTime? _selectedDueDate;
+  final _contentController = TextEditingController();
   bool _isLoading = false;
 
   @override
   void dispose() {
-    _titleController.dispose();
-    _descriptionController.dispose();
+    _contentController.dispose();
     super.dispose();
   }
 
@@ -44,40 +41,16 @@ class _AddTodoDialogState extends ConsumerState<AddTodoDialog> {
             mainAxisSize: MainAxisSize.min,
             children: [
               CustomTextField(
-                controller: _titleController,
-                labelText: 'Title',
+                controller: _contentController,
+                labelText: 'Content',
+                hintText: 'Enter todo content...',
+                maxLines: 3,
                 validator: (value) {
                   if (value == null || value.trim().isEmpty) {
-                    return 'Please enter a title';
+                    return 'Please enter content';
                   }
                   return null;
                 },
-              ),
-              const SizedBox(height: 16),
-              CustomTextField(
-                controller: _descriptionController,
-                labelText: 'Description (optional)',
-                maxLines: 3,
-              ),
-              const SizedBox(height: 16),
-              InkWell(
-                onTap: _selectDueDate,
-                child: InputDecorator(
-                  decoration: const InputDecoration(
-                    labelText: 'Due Date (optional)',
-                    suffixIcon: Icon(Icons.calendar_today),
-                  ),
-                  child: Text(
-                    _selectedDueDate == null
-                        ? 'Select due date'
-                        : _formatDate(_selectedDueDate!),
-                    style: _selectedDueDate == null
-                        ? Theme.of(context).textTheme.bodyMedium?.copyWith(
-                              color: Colors.grey[600],
-                            )
-                        : null,
-                  ),
-                ),
               ),
             ],
           ),
@@ -98,24 +71,6 @@ class _AddTodoDialogState extends ConsumerState<AddTodoDialog> {
     );
   }
 
-  Future<void> _selectDueDate() async {
-    final picked = await showDatePicker(
-      context: context,
-      initialDate: _selectedDueDate ?? DateTime.now(),
-      firstDate: DateTime.now(),
-      lastDate: DateTime.now().add(const Duration(days: 365)),
-    );
-
-    if (picked != null) {
-      setState(() {
-        _selectedDueDate = picked;
-      });
-    }
-  }
-
-  String _formatDate(DateTime date) {
-    return '${date.day}/${date.month}/${date.year}';
-  }
 
   Future<void> _handleAddTodo() async {
     if (!_formKey.currentState!.validate()) {
@@ -128,11 +83,7 @@ class _AddTodoDialogState extends ConsumerState<AddTodoDialog> {
 
     try {
       await ref.read(todoProvider(widget.calendarId).notifier).createTodo(
-            title: _titleController.text.trim(),
-            description: _descriptionController.text.trim().isEmpty
-                ? null
-                : _descriptionController.text.trim(),
-            dueDate: _selectedDueDate,
+            content: _contentController.text.trim(),
           );
 
       if (mounted) {

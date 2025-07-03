@@ -2,10 +2,9 @@ import 'package:flutter/material.dart';
 
 class TodoItemCard extends StatelessWidget {
   final String id;
-  final String title;
-  final String? description;
-  final DateTime? dueDate;
+  final String content;
   final bool isCompleted;
+  final int? voteCount;
   final VoidCallback? onTap;
   final VoidCallback? onComplete;
   final VoidCallback? onDelete;
@@ -13,10 +12,9 @@ class TodoItemCard extends StatelessWidget {
   const TodoItemCard({
     super.key,
     required this.id,
-    required this.title,
-    this.description,
-    this.dueDate,
+    required this.content,
     this.isCompleted = false,
+    this.voteCount,
     this.onTap,
     this.onComplete,
     this.onDelete,
@@ -74,7 +72,7 @@ class TodoItemCard extends StatelessWidget {
             onPressed: onComplete,
           ),
           title: Text(
-            title,
+            content,
             style: TextStyle(
               decoration: isCompleted
                   ? TextDecoration.lineThrough
@@ -82,25 +80,21 @@ class TodoItemCard extends StatelessWidget {
               color: isCompleted ? Colors.grey : null,
             ),
           ),
-          subtitle: description != null || dueDate != null
-              ? Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    if (description != null)
-                      Text(
-                        description!,
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    if (dueDate != null)
-                      Text(
-                        _formatDueDate(dueDate!),
-                        style: TextStyle(
-                          color: _getDueDateColor(context, dueDate!),
-                          fontSize: 12,
-                        ),
-                      ),
-                  ],
+          subtitle: voteCount != null && voteCount! > 0
+              ? Text(
+                  '${voteCount!} votes',
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.primary,
+                    fontSize: 12,
+                    fontWeight: FontWeight.w500,
+                  ),
+                )
+              : null,
+          trailing: voteCount != null && voteCount! > 0
+              ? Icon(
+                  Icons.how_to_vote,
+                  size: 16,
+                  color: Theme.of(context).colorScheme.primary,
                 )
               : null,
         ),
@@ -134,33 +128,4 @@ class TodoItemCard extends StatelessWidget {
         false;
   }
 
-  String _formatDueDate(DateTime date) {
-    final now = DateTime.now();
-    final difference = date.difference(now);
-    
-    if (difference.inDays == 0) {
-      return 'Due today';
-    } else if (difference.inDays == 1) {
-      return 'Due tomorrow';
-    } else if (difference.inDays == -1) {
-      return 'Due yesterday';
-    } else if (difference.inDays > 0) {
-      return 'Due in ${difference.inDays} days';
-    } else {
-      return 'Overdue by ${-difference.inDays} days';
-    }
-  }
-
-  Color _getDueDateColor(BuildContext context, DateTime date) {
-    final now = DateTime.now();
-    final difference = date.difference(now);
-    
-    if (difference.inDays < 0) {
-      return Theme.of(context).colorScheme.error;
-    } else if (difference.inDays <= 1) {
-      return Colors.orange;
-    } else {
-      return Colors.grey;
-    }
-  }
 }

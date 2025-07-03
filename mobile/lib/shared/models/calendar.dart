@@ -3,11 +3,20 @@ import 'package:equatable/equatable.dart';
 
 part 'calendar.g.dart';
 
+enum CalendarType {
+  @JsonValue('PERSONAL')
+  personal,
+  @JsonValue('GENERAL')
+  general,
+}
+
 @JsonSerializable()
 class Calendar extends Equatable {
   final int id;
   final String name;
   final String? description;
+  @JsonKey(name: 'calendar_type')
+  final CalendarType calendarType;
   @JsonKey(name: 'owner_id')
   final int ownerId;
   @JsonKey(name: 'created_at')
@@ -17,6 +26,7 @@ class Calendar extends Equatable {
     required this.id,
     required this.name,
     this.description,
+    required this.calendarType,
     required this.ownerId,
     required this.createdAt,
   });
@@ -25,7 +35,7 @@ class Calendar extends Equatable {
   Map<String, dynamic> toJson() => _$CalendarToJson(this);
 
   @override
-  List<Object?> get props => [id, name, description, ownerId, createdAt];
+  List<Object?> get props => [id, name, description, calendarType, ownerId, createdAt];
 }
 
 @JsonSerializable()

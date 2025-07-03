@@ -10,6 +10,7 @@ Calendar _$CalendarFromJson(Map<String, dynamic> json) => Calendar(
       id: (json['id'] as num).toInt(),
       name: json['name'] as String,
       description: json['description'] as String?,
+      calendarType: $enumDecode(_$CalendarTypeEnumMap, json['calendar_type']),
       ownerId: (json['owner_id'] as num).toInt(),
       createdAt: DateTime.parse(json['created_at'] as String),
     );
@@ -18,9 +19,15 @@ Map<String, dynamic> _$CalendarToJson(Calendar instance) => <String, dynamic>{
       'id': instance.id,
       'name': instance.name,
       'description': instance.description,
+      'calendar_type': _$CalendarTypeEnumMap[instance.calendarType]!,
       'owner_id': instance.ownerId,
       'created_at': instance.createdAt.toIso8601String(),
     };
+
+const _$CalendarTypeEnumMap = {
+  CalendarType.personal: 'PERSONAL',
+  CalendarType.general: 'GENERAL',
+};
 
 CalendarCreate _$CalendarCreateFromJson(Map<String, dynamic> json) =>
     CalendarCreate(

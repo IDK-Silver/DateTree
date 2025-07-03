@@ -14,7 +14,7 @@ class _ApiClient implements ApiClient {
     this.baseUrl,
     this.errorLogger,
   }) {
-    baseUrl ??= 'http://127.0.0.1:8000/api/v1';
+    baseUrl ??= 'http://10.0.2.2:8000/api/v1';
   }
 
   final Dio _dio;
@@ -332,7 +332,7 @@ class _ApiClient implements ApiClient {
     )
         .compose(
           _dio.options,
-          '/calendars/${calendarId}/lists',
+          '/lists/calendar/${calendarId}',
           queryParameters: queryParameters,
           data: _data,
         )
@@ -355,10 +355,7 @@ class _ApiClient implements ApiClient {
   }
 
   @override
-  Future<TodoList> createList(
-    int calendarId,
-    TodoListCreate list,
-  ) async {
+  Future<TodoList> createList(TodoListCreate list) async {
     final _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};
     final _headers = <String, dynamic>{};
@@ -371,7 +368,7 @@ class _ApiClient implements ApiClient {
     )
         .compose(
           _dio.options,
-          '/calendars/${calendarId}/lists',
+          '/lists/',
           queryParameters: queryParameters,
           data: _data,
         )
@@ -499,7 +496,7 @@ class _ApiClient implements ApiClient {
     )
         .compose(
           _dio.options,
-          '/lists/${listId}/items',
+          '/list-items/list/${listId}',
           queryParameters: queryParameters,
           data: _data,
         )
@@ -522,10 +519,7 @@ class _ApiClient implements ApiClient {
   }
 
   @override
-  Future<ListItem> createListItem(
-    int listId,
-    ListItemCreate item,
-  ) async {
+  Future<ListItem> createListItem(ListItemCreate item) async {
     final _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};
     final _headers = <String, dynamic>{};
@@ -538,7 +532,7 @@ class _ApiClient implements ApiClient {
     )
         .compose(
           _dio.options,
-          '/lists/${listId}/items',
+          '/list-items/',
           queryParameters: queryParameters,
           data: _data,
         )
@@ -571,7 +565,7 @@ class _ApiClient implements ApiClient {
     )
         .compose(
           _dio.options,
-          '/items/${id}',
+          '/list-items/${id}',
           queryParameters: queryParameters,
           data: _data,
         )
@@ -608,7 +602,7 @@ class _ApiClient implements ApiClient {
     )
         .compose(
           _dio.options,
-          '/items/${id}',
+          '/list-items/${id}',
           queryParameters: queryParameters,
           data: _data,
         )
@@ -641,7 +635,7 @@ class _ApiClient implements ApiClient {
     )
         .compose(
           _dio.options,
-          '/items/${id}',
+          '/list-items/${id}',
           queryParameters: queryParameters,
           data: _data,
         )

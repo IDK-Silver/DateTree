@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:table_calendar/table_calendar.dart';
 
+import '../../../core/providers/todo_provider.dart';
+
 class CalendarScreen extends ConsumerStatefulWidget {
   const CalendarScreen({super.key});
 
@@ -13,6 +15,7 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
   CalendarFormat _calendarFormat = CalendarFormat.month;
   DateTime _focusedDay = DateTime.now();
   DateTime? _selectedDay;
+  Set<int> _selectedCalendarIds = {};
 
   @override
   void initState() {
@@ -144,93 +147,112 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
   }
 
   void _showFilterBottomSheet(BuildContext context) {
+    final calendarState = ref.read(calendarProvider);
+    final calendars = calendarState.calendars;
+    
+    // Initialize selected calendars if empty
+    if (_selectedCalendarIds.isEmpty && calendars.isNotEmpty) {
+      _selectedCalendarIds = calendars.map((c) => c.id).toSet();
+    }
+    
     showModalBottomSheet(
       context: context,
+      isScrollControlled: true,
       builder: (BuildContext context) {
-        return Container(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        return StatefulBuilder(
+          builder: (BuildContext context, StateSetter setModalState) {
+            return Container(
+              padding: const EdgeInsets.all(16.0),
+              constraints: BoxConstraints(
+                maxHeight: MediaQuery.of(context).size.height * 0.8,
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    'Filter Calendars',
-                    style: Theme.of(context).textTheme.titleLarge,
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        'Filter Calendars',
+                        style: Theme.of(context).textTheme.titleLarge,
+                      ),
+                      TextButton(
+                        onPressed: () {
+                          Navigator.pop(context);
+                          setState(() {});
+                        },
+                        child: const Text('Done'),
+                      ),
+                    ],
                   ),
-                  TextButton(
-                    onPressed: () {
-                      Navigator.pop(context);
-                    },
-                    child: const Text('Done'),
-                  ),
+                  const SizedBox(height: 16),
+                  if (calendars.isEmpty)
+                    const Padding(
+                      padding: EdgeInsets.symmetric(vertical: 32.0),
+                      child: Center(
+                        child: Text('No calendars available'),
+                      ),
+                    )
+                  else ...[                    
+                    const Text(
+                      'Calendars',
+                      style: TextStyle(fontWeight: FontWeight.w600),
+                    ),
+                    const SizedBox(height: 8),
+                    Flexible(
+                      child: ListView.builder(
+                        shrinkWrap: true,
+                        itemCount: calendars.length,
+                        itemBuilder: (context, index) {
+                          final calendar = calendars[index];
+                          return CheckboxListTile(
+                            title: Text(calendar.name),
+                            subtitle: calendar.description != null 
+                                ? Text(calendar.description!) 
+                                : null,
+                            value: _selectedCalendarIds.contains(calendar.id),
+                            onChanged: (bool? value) {
+                              setModalState(() {
+                                if (value == true) {
+                                  _selectedCalendarIds.add(calendar.id);
+                                } else {
+                                  _selectedCalendarIds.remove(calendar.id);
+                                }
+                              });
+                            },
+                            controlAffinity: ListTileControlAffinity.leading,
+                          );
+                        },
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        TextButton(
+                          onPressed: () {
+                            setModalState(() {
+                              _selectedCalendarIds.clear();
+                            });
+                          },
+                          child: const Text('Clear All'),
+                        ),
+                        TextButton(
+                          onPressed: () {
+                            setModalState(() {
+                              _selectedCalendarIds = calendars.map((c) => c.id).toSet();
+                            });
+                          },
+                          child: const Text('Select All'),
+                        ),
+                      ],
+                    ),
+                  ],
                 ],
               ),
-              const SizedBox(height: 16),
-              const Text(
-                'Preset Modes',
-                style: TextStyle(fontWeight: FontWeight.w600),
-              ),
-              const SizedBox(height: 8),
-              Wrap(
-                spacing: 8,
-                children: [
-                  FilterChip(
-                    label: const Text('Personal'),
-                    selected: true,
-                    onSelected: (bool selected) {},
-                  ),
-                  FilterChip(
-                    label: const Text('Life'),
-                    selected: false,
-                    onSelected: (bool selected) {},
-                  ),
-                  FilterChip(
-                    label: const Text('Social'),
-                    selected: false,
-                    onSelected: (bool selected) {},
-                  ),
-                  FilterChip(
-                    label: const Text('Work'),
-                    selected: false,
-                    onSelected: (bool selected) {},
-                  ),
-                ],
-              ),
-              const SizedBox(height: 16),
-              const Text(
-                'Calendars',
-                style: TextStyle(fontWeight: FontWeight.w600),
-              ),
-              const SizedBox(height: 8),
-              CheckboxListTile(
-                title: const Text('Personal'),
-                value: true,
-                onChanged: (bool? value) {},
-                controlAffinity: ListTileControlAffinity.leading,
-              ),
-              CheckboxListTile(
-                title: const Text('Lover'),
-                value: true,
-                onChanged: (bool? value) {},
-                controlAffinity: ListTileControlAffinity.leading,
-              ),
-              CheckboxListTile(
-                title: const Text('Friends'),
-                value: true,
-                onChanged: (bool? value) {},
-                controlAffinity: ListTileControlAffinity.leading,
-              ),
-              CheckboxListTile(
-                title: const Text('Work'),
-                value: true,
-                onChanged: (bool? value) {},
-                controlAffinity: ListTileControlAffinity.leading,
-              ),
-            ],
-          ),
+            );
+          },
         );
       },
     );
