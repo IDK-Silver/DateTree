@@ -206,8 +206,12 @@ async def create_item(
 - ✅ UI component library (atoms, molecules, templates)
 - ✅ State management with Riverpod
 - ✅ Material 3 theme system with dark mode support
-- 🚧 API integration and data synchronization
-- 📋 Core functionality implementation (todo, calendar, voting)
+- ✅ Complete API integration with backend FastAPI service
+- ✅ Dynamic calendar management (removed hardcoded categories)
+- ✅ Data model alignment with backend API specifications
+- ✅ Proper HTTP endpoint mapping and JSON serialization
+- 🚧 Core functionality implementation (todo management, voting, events)
+- 🚧 Offline-first data synchronization
 
 ## Important Notes
 
